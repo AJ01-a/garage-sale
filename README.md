@@ -36,11 +36,9 @@ Garage-Sale/
 │   ├── favicon-32.png
 │   └── apple-touch-icon.png
 │
-├── tools/
-│   ├── build-assets.py         ← re-creates the QR code + all PNG images
-│   └── set-site-url.py         ← puts your real website address everywhere
-│
-└── .github/workflows/pages.yml ← tells GitHub to publish the site automatically
+└── tools/
+    ├── build-assets.py         ← re-creates the QR code + all PNG images
+    └── set-site-url.py         ← puts your real website address everywhere
 ```
 
 ---
@@ -103,10 +101,8 @@ Leave that page open — you'll need it in the next step.
 5. In the **Commit changes** box at the bottom type `Add garage sale website` and click
    **Commit changes**.
 
-> ⚠️ **Two files are invisible in the drag-and-drop method**, because their names start
-> with a dot or are inside a hidden folder: `.nojekyll` and `.github/workflows/pages.yml`.
-> That's fine — you don't need them if you use the "Deploy from a branch" setting in
-> step **D**, which is the option below. Everything will still work.
+> ⚠️ **One file is invisible in the drag-and-drop method** because its name starts with a
+> dot: `.nojekyll`. That's fine — the website works without it.
 
 ### Option 2 — With Git (if you've installed it)
 
@@ -136,16 +132,12 @@ the first time.
 5. Wait about 1–2 minutes, then refresh the page. A green banner appears at the top with
    your website address.
 
-> **Using Git (Option 2)?** You can instead pick **GitHub Actions** as the source — the
-> included `.github/workflows/pages.yml` file then publishes the site automatically every
-> time you push a change. Both methods produce the exact same website; "Deploy from a
-> branch" is simpler, so start there.
+> **This project uses "Deploy from a branch".** GitHub serves the files in the repository
+> exactly as they are — there is no build step and no GitHub Actions workflow to go wrong.
+> Every time you push (or upload) a change, the live site updates within a minute or two.
 >
-> ⚠️ If you pushed with Git, chose **Deploy from a branch**, and then get an email about a
-> failed workflow (a red ✗ in the **Actions** tab), nothing is broken — your site is fine.
-> It just means the automatic workflow tried to publish while Pages was set to branch mode.
-> Either ignore it, delete the file `.github/workflows/pages.yml`, or switch the Pages
-> source to **GitHub Actions**. Pick one method and stick with it.
+> There is also a "GitHub Actions" source option. It produces the identical website but
+> adds a moving part that can fail, so this project doesn't use it.
 
 ---
 
