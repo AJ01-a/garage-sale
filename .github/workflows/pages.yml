@@ -31,6 +31,10 @@ jobs:
 
       - name: Set up Pages
         uses: actions/configure-pages@v5
+        with:
+          # Switches GitHub Pages on automatically the first time this runs,
+          # so there is nothing to click in the repository settings.
+          enablement: true
 
       - name: Package the website
         uses: actions/upload-pages-artifact@v3
