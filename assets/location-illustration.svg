@@ -1,0 +1,108 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600" role="img" aria-labelledby="loc-title loc-desc">
+  <title id="loc-title">Where the garage sale is set up</title>
+  <desc id="loc-desc">Illustration of a house on Bradley Boulevard with a marker reading Garage Sale Here and tables set up in the driveway.</desc>
+
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#EAF6F7"/>
+      <stop offset="1" stop-color="#FFF7EC"/>
+    </linearGradient>
+    <style>
+      .disp { font-family: "Lato Black", Lato, "Arial Black", "Helvetica Neue", Helvetica, Arial, sans-serif; font-weight: 900; }
+      .body { font-family: Lato, "Helvetica Neue", Helvetica, Arial, sans-serif; font-weight: 700; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="600" fill="url(#sky)"/>
+
+  <!-- Grass -->
+  <rect x="0" y="392" width="1200" height="208" fill="#DCEBD6"/>
+  <!-- Street -->
+  <rect x="0" y="486" width="1200" height="114" fill="#CFC7BC"/>
+  <rect x="0" y="486" width="1200" height="8" fill="#B9AFA2"/>
+  <g stroke="#FFFFFF" stroke-width="7" stroke-dasharray="46 40" opacity="0.9">
+    <line x1="0" y1="546" x2="1200" y2="546"/>
+  </g>
+  <text class="body" x="60" y="586" font-size="24" fill="#5C5347" letter-spacing="4">BRADLEY BOULEVARD</text>
+
+  <!-- Trees -->
+  <g>
+    <rect x="122" y="352" width="16" height="52" fill="#8A6A4B"/>
+    <circle cx="130" cy="330" r="52" fill="#77B37C"/>
+    <circle cx="100" cy="348" r="34" fill="#68A76E"/>
+    <circle cx="160" cy="348" r="34" fill="#68A76E"/>
+  </g>
+  <g>
+    <rect x="1064" y="360" width="14" height="46" fill="#8A6A4B"/>
+    <circle cx="1071" cy="342" r="44" fill="#77B37C"/>
+    <circle cx="1044" cy="358" r="28" fill="#68A76E"/>
+    <circle cx="1098" cy="358" r="28" fill="#68A76E"/>
+  </g>
+
+  <!-- House -->
+  <g>
+    <!-- body -->
+    <rect x="380" y="242" width="440" height="182" fill="#FFFFFF" stroke="#2B2118" stroke-width="6"/>
+    <!-- roof -->
+    <path d="M352 248 L600 116 L848 248 Z" fill="#E4572E" stroke="#2B2118" stroke-width="6" stroke-linejoin="round"/>
+    <!-- chimney -->
+    <rect x="736" y="152" width="38" height="62" fill="#C9603E" stroke="#2B2118" stroke-width="6"/>
+    <!-- windows -->
+    <g fill="#CFE8EA" stroke="#2B2118" stroke-width="5">
+      <rect x="424" y="284" width="76" height="66" rx="4"/>
+      <rect x="700" y="284" width="76" height="66" rx="4"/>
+    </g>
+    <g stroke="#2B2118" stroke-width="4">
+      <line x1="462" y1="284" x2="462" y2="350"/>
+      <line x1="424" y1="317" x2="500" y2="317"/>
+      <line x1="738" y1="284" x2="738" y2="350"/>
+      <line x1="700" y1="317" x2="776" y2="317"/>
+    </g>
+    <!-- garage door (open) -->
+    <rect x="536" y="288" width="128" height="136" fill="#F3E7D4" stroke="#2B2118" stroke-width="6"/>
+    <g stroke="#D8C6AC" stroke-width="4">
+      <line x1="536" y1="322" x2="664" y2="322"/>
+      <line x1="536" y1="356" x2="664" y2="356"/>
+      <line x1="536" y1="390" x2="664" y2="390"/>
+    </g>
+    <!-- house number plaque -->
+    <rect x="826" y="286" width="74" height="46" rx="8" fill="#17363F"/>
+    <text class="disp" x="863" y="319" text-anchor="middle" font-size="28" fill="#FFFFFF">55</text>
+  </g>
+
+  <!-- Driveway -->
+  <path d="M520 424 L680 424 L744 486 L456 486 Z" fill="#DED6CB" stroke="#C4B9AA" stroke-width="4"/>
+
+  <!-- Sale tables in the driveway -->
+  <g>
+    <!-- table 1 -->
+    <rect x="300" y="404" width="168" height="16" rx="4" fill="#B98A5A" stroke="#2B2118" stroke-width="5"/>
+    <rect x="312" y="420" width="10" height="44" fill="#8A6A4B"/>
+    <rect x="446" y="420" width="10" height="44" fill="#8A6A4B"/>
+    <rect x="322" y="374" width="42" height="30" rx="5" fill="#FFC145" stroke="#2B2118" stroke-width="4"/>
+    <circle cx="398" cy="388" r="17" fill="#126E73" stroke="#2B2118" stroke-width="4"/>
+    <rect x="424" y="380" width="30" height="24" rx="4" fill="#E4572E" stroke="#2B2118" stroke-width="4"/>
+    <!-- table 2 -->
+    <rect x="736" y="404" width="168" height="16" rx="4" fill="#B98A5A" stroke="#2B2118" stroke-width="5"/>
+    <rect x="748" y="420" width="10" height="44" fill="#8A6A4B"/>
+    <rect x="882" y="420" width="10" height="44" fill="#8A6A4B"/>
+    <rect x="754" y="376" width="36" height="28" rx="5" fill="#2F7D4F" stroke="#2B2118" stroke-width="4"/>
+    <circle cx="824" cy="388" r="17" fill="#FFC145" stroke="#2B2118" stroke-width="4"/>
+    <rect x="852" y="378" width="34" height="26" rx="4" fill="#126E73" stroke="#2B2118" stroke-width="4"/>
+    <!-- boxes on the ground -->
+    <rect x="500" y="440" width="52" height="38" rx="4" fill="#D9A86C" stroke="#2B2118" stroke-width="4"/>
+    <rect x="642" y="444" width="46" height="34" rx="4" fill="#D9A86C" stroke="#2B2118" stroke-width="4"/>
+  </g>
+
+  <!-- "Garage Sale Here" marker -->
+  <g>
+    <line x1="600" y1="196" x2="600" y2="118" stroke="#2B2118" stroke-width="0"/>
+    <g transform="translate(600 84)">
+      <rect x="-196" y="-56" width="392" height="86" rx="18" fill="#E4572E" stroke="#2B2118" stroke-width="6"/>
+      <path d="M-16 30 L16 30 L0 58 Z" fill="#E4572E" stroke="#2B2118" stroke-width="6" stroke-linejoin="round"/>
+      <path d="M-14 32 L14 32 L0 52 Z" fill="#E4572E"/>
+      <text class="disp" x="0" y="-4" text-anchor="middle" font-size="44" fill="#FFFFFF">GARAGE SALE</text>
+      <text class="body" x="0" y="22" text-anchor="middle" font-size="22" fill="#FFE0D2" letter-spacing="6">RIGHT HERE!</text>
+    </g>
+  </g>
+</svg>

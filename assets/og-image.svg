@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="og-title">
+  <title id="og-title">Garage Sale — Saturday, August 15, 8 AM to 4 PM, 55 Bradley Boulevard, Neepawa MB</title>
+
+  <defs>
+    <linearGradient id="ogbg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFBF3"/>
+      <stop offset="1" stop-color="#FCE7CB"/>
+    </linearGradient>
+    <pattern id="ogdots" width="44" height="44" patternUnits="userSpaceOnUse">
+      <circle cx="8" cy="8" r="3.6" fill="#E4572E" opacity="0.10"/>
+      <circle cx="30" cy="30" r="3.6" fill="#126E73" opacity="0.10"/>
+    </pattern>
+    <style>
+      .disp { font-family: "Lato Black", Lato, "Arial Black", "Helvetica Neue", Helvetica, Arial, sans-serif; font-weight: 900; }
+      .body { font-family: Lato, "Helvetica Neue", Helvetica, Arial, sans-serif; font-weight: 700; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#ogbg)"/>
+  <rect width="1200" height="630" fill="url(#ogdots)"/>
+
+  <!-- Bunting -->
+  <g>
+    <path d="M40 54 Q 600 104 1160 54" fill="none" stroke="#2B2118" stroke-width="5" stroke-linecap="round"/>
+    <path d="M64 60 L116 66 L88 118 Z" fill="#E4572E"/>
+    <path d="M148 71 L200 77 L172 129 Z" fill="#FFC145"/>
+    <path d="M232 81 L284 85 L256 137 Z" fill="#126E73"/>
+    <path d="M316 88 L368 92 L340 144 Z" fill="#2F7D4F"/>
+    <path d="M400 93 L452 96 L424 148 Z" fill="#E4572E"/>
+    <path d="M484 97 L536 98 L508 150 Z" fill="#FFC145"/>
+    <path d="M568 99 L620 100 L592 152 Z" fill="#126E73"/>
+    <path d="M652 100 L704 99 L676 151 Z" fill="#2F7D4F"/>
+    <path d="M748 98 L800 96 L772 148 Z" fill="#E4572E"/>
+    <path d="M832 94 L884 91 L856 143 Z" fill="#2F7D4F"/>
+    <path d="M916 89 L968 84 L940 136 Z" fill="#E4572E"/>
+    <path d="M1000 81 L1052 74 L1024 126 Z" fill="#FFC145"/>
+    <path d="M1084 70 L1136 61 L1108 113 Z" fill="#126E73"/>
+  </g>
+
+  <!-- Headline -->
+  <text class="disp" x="600" y="258" text-anchor="middle" font-size="108" fill="#17363F" letter-spacing="1">GARAGE</text>
+  <g transform="rotate(-2 600 348)">
+    <text class="disp" x="605" y="363" text-anchor="middle" font-size="140" fill="#FFC145">SALE!</text>
+    <text class="disp" x="600" y="358" text-anchor="middle" font-size="140" fill="#E4572E">SALE!</text>
+  </g>
+
+  <!-- Date + time banner -->
+  <g>
+    <rect x="150" y="404" width="900" height="80" rx="14" fill="#17363F"/>
+    <text class="disp" x="600" y="459" text-anchor="middle" font-size="46" fill="#FFFFFF">SATURDAY, AUGUST 15  ·  8 AM – 4 PM</text>
+  </g>
+
+  <!-- Address -->
+  <text class="disp" x="600" y="546" text-anchor="middle" font-size="50" fill="#17363F">55 BRADLEY BOULEVARD</text>
+  <text class="body" x="600" y="592" text-anchor="middle" font-size="34" fill="#126E73" letter-spacing="3">NEEPAWA, MANITOBA</text>
+</svg>

@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+     width="850" height="1100" viewBox="0 0 850 1100" role="img" aria-labelledby="poster-title">
+  <title id="poster-title">Printable garage sale poster — Saturday, August 15, 8 AM to 4 PM, 55 Bradley Boulevard, Neepawa MB</title>
+
+  <defs>
+    <linearGradient id="pbg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFDF8"/>
+      <stop offset="1" stop-color="#FDEEDA"/>
+    </linearGradient>
+    <pattern id="pdots" width="40" height="40" patternUnits="userSpaceOnUse">
+      <circle cx="7" cy="7" r="3" fill="#E4572E" opacity="0.09"/>
+      <circle cx="27" cy="27" r="3" fill="#126E73" opacity="0.09"/>
+    </pattern>
+    <style>
+      .disp { font-family: "Lato Black", Lato, "Arial Black", "Helvetica Neue", Helvetica, Arial, sans-serif; font-weight: 900; }
+      .body { font-family: Lato, "Helvetica Neue", Helvetica, Arial, sans-serif; font-weight: 700; }
+    </style>
+  </defs>
+
+  <rect width="850" height="1100" fill="url(#pbg)"/>
+  <rect width="850" height="1100" fill="url(#pdots)"/>
+  <rect x="22" y="22" width="806" height="1056" rx="30" fill="none" stroke="#2B2118" stroke-width="6"/>
+  <rect x="38" y="38" width="774" height="1024" rx="22" fill="none" stroke="#E4572E" stroke-width="3" stroke-dasharray="12 10"/>
+
+  <!-- Bunting -->
+  <g>
+    <path d="M62 84 Q 425 128 788 84" fill="none" stroke="#2B2118" stroke-width="4.5" stroke-linecap="round"/>
+    <path d="M80 88 L118 93 L98 135 Z" fill="#E4572E"/>
+    <path d="M142 97 L180 101 L160 143 Z" fill="#FFC145"/>
+    <path d="M204 104 L242 107 L222 149 Z" fill="#126E73"/>
+    <path d="M266 109 L304 111 L284 153 Z" fill="#2F7D4F"/>
+    <path d="M328 112 L366 113 L346 155 Z" fill="#E4572E"/>
+    <path d="M390 114 L428 114 L408 156 Z" fill="#FFC145"/>
+    <path d="M452 113 L490 112 L470 154 Z" fill="#126E73"/>
+    <path d="M514 111 L552 108 L532 150 Z" fill="#2F7D4F"/>
+    <path d="M576 106 L614 102 L594 144 Z" fill="#E4572E"/>
+    <path d="M638 100 L676 95 L656 137 Z" fill="#FFC145"/>
+    <path d="M700 92 L738 86 L718 128 Z" fill="#126E73"/>
+  </g>
+
+  <!-- Headline -->
+  <text class="disp" x="425" y="272" text-anchor="middle" font-size="104" fill="#17363F">GARAGE</text>
+  <g transform="rotate(-2 425 380)">
+    <text class="disp" x="429" y="392" text-anchor="middle" font-size="150" fill="#FFC145">SALE</text>
+    <text class="disp" x="425" y="388" text-anchor="middle" font-size="150" fill="#E4572E">SALE</text>
+  </g>
+
+  <!-- Date banner -->
+  <g>
+    <path d="M86 436 L764 436 L764 512 L86 512 Z" fill="#17363F"/>
+    <path d="M86 436 L52 474 L86 512 Z" fill="#122A31"/>
+    <path d="M764 436 L798 474 L764 512 Z" fill="#122A31"/>
+    <text class="disp" x="425" y="487" text-anchor="middle" font-size="45" fill="#FFFFFF">SATURDAY, AUGUST 15</text>
+  </g>
+
+  <!-- Time -->
+  <text class="disp" x="425" y="588" text-anchor="middle" font-size="62" fill="#2B2118">8:00 AM – 4:00 PM</text>
+  <line x1="300" y1="622" x2="550" y2="622" stroke="#E4572E" stroke-width="5" stroke-linecap="round"/>
+
+  <!-- Address -->
+  <text class="disp" x="425" y="694" text-anchor="middle" font-size="50" fill="#17363F">55 BRADLEY BOULEVARD</text>
+  <text class="disp" x="425" y="744" text-anchor="middle" font-size="42" fill="#126E73">NEEPAWA, MB</text>
+
+  <!-- QR code: scan for map + details -->
+  <g>
+    <rect x="335" y="784" width="180" height="180" rx="14" fill="#FFFFFF" stroke="#E0D2BC" stroke-width="3"/>
+    <image href="garage-sale-qr.png" xlink:href="garage-sale-qr.png"
+           x="345" y="794" width="160" height="160" preserveAspectRatio="xMidYMid meet"/>
+    <text class="body" x="425" y="1000" text-anchor="middle" font-size="24" fill="#6B5B4C" letter-spacing="2">SCAN FOR THE MAP &amp; DIRECTIONS</text>
+  </g>
+
+  <!-- Footer -->
+  <text class="body" x="425" y="1042" text-anchor="middle" font-size="22" fill="#6B5B4C" letter-spacing="2">HOUSEHOLD &amp; MISCELLANEOUS ITEMS  ·  RAIN OR SHINE</text>
+</svg>

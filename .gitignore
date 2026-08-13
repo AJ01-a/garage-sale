@@ -1,0 +1,10 @@
+# Operating-system and editor clutter — not part of the website
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+.vscode/
+.idea/
+
+# In case you ever install Node tooling in this folder
+node_modules/

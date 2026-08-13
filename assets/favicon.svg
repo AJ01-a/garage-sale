@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Garage sale price tag icon">
+  <rect width="64" height="64" rx="14" fill="#E4572E"/>
+  <!-- Price tag -->
+  <path d="M33.5 9 L55 30.5 a5 5 0 0 1 0 7 L37.5 55 a5 5 0 0 1 -7 0 L9 33.5 L9 14 a5 5 0 0 1 5 -5 Z"
+        fill="#FFC145" stroke="#2B2118" stroke-width="3.4" stroke-linejoin="round"/>
+  <circle cx="21" cy="21" r="5.2" fill="#FFF7EC" stroke="#2B2118" stroke-width="3.2"/>
+  <!-- Small house roof mark on the tag -->
+  <path d="M30 44 L40 34 L50 44" fill="none" stroke="#2B2118" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
