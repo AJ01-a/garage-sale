@@ -806,6 +806,21 @@ ul { margin: 0; padding: 0; list-style: none; }
   .map-frame, .bunting, .hero__wave, .toast, .skip-link { display: none !important; }
   body { background: #fff; color: #000; font-size: 12pt; }
   .section, .hero { padding: .5rem 0; }
+  /* Show everything instantly. Without killing the transition, the fade-in
+     sections are still part-way through fading when the page is captured
+     for printing, and come out pale. */
+  *, *::before, *::after {
+    transition: none !important;
+    animation: none !important;
+  }
   .reveal { opacity: 1 !important; transform: none !important; }
-  a[href^="http"]::after { content: " (" attr(href) ")"; font-size: .8em; word-break: break-all; }
+  /* Tap-only controls are useless on paper — the address is printed as text */
+  .map-card__actions { display: none !important; }
+  /* Spell out where a link goes, but never inside a button (it turns the
+     button into an unreadable block of URL) */
+  a[href^="http"]:not(.btn)::after {
+    content: " (" attr(href) ")";
+    font-size: .8em;
+    word-break: break-all;
+  }
 }

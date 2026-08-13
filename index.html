@@ -82,10 +82,16 @@
 </head>
 
 <body>
+<!-- Target for the "Back to top" links. It has to sit here, in the normal
+     flow at the very top of the page — NOT on the header below. The header
+     is sticky, so it is always pinned to the top of the screen; jumping to
+     it would scroll nowhere. -->
+<span id="top"></span>
+
 <a class="skip-link" href="#main">Skip to main content</a>
 
 <!-- ================= NAVIGATION ================= -->
-<header class="site-header" id="top">
+<header class="site-header">
   <nav class="nav" aria-label="Main">
     <a class="nav__brand" href="#top">
       <span class="nav__brand-icon" aria-hidden="true">🏷️</span>
