@@ -650,7 +650,6 @@ ul { margin: 0; padding: 0; list-style: none; }
   color: var(--ink-soft);
   margin-bottom: 1rem;
 }
-.share-card__title--spaced { margin-top: 1.6rem; }
 .qr {
   width: min(240px, 70%);
   margin: 0 auto;
@@ -764,8 +763,6 @@ ul { margin: 0; padding: 0; list-style: none; }
   .cards { grid-template-columns: repeat(2, 1fr); }
   .map-card__actions { grid-template-columns: repeat(2, 1fr); }
   .share-card__actions { grid-template-columns: repeat(2, 1fr); }
-  /* The download buttons have long labels — give them the full width */
-  .share-card__actions--stacked { grid-template-columns: 1fr; }
   .countdown__grid { gap: .6rem; }
   .countdown { padding: 1.35rem 1.25rem 1.5rem; }
 }
