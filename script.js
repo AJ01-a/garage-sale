@@ -22,8 +22,8 @@ const SITE_CONFIG = {
 
   // --- THIS WEBSITE'S ADDRESS --------------------------------------------
   // Leave as-is until GitHub Pages gives you a real URL, then paste it here
-  // (or run:  python3 tools/set-site-url.py https://YOUR-USERNAME.github.io/garage-sale/ )
-  siteUrl: 'https://YOUR-USERNAME.github.io/garage-sale/',
+  // (or run:  python3 tools/set-site-url.py https://aj01-a.github.io/garage-sale/ )
+  siteUrl: 'https://aj01-a.github.io/garage-sale/',
 
   // --- MESSAGES -----------------------------------------------------------
   labelBefore: 'Sale starts in',
