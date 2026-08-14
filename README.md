@@ -18,7 +18,7 @@ It also comes with ready-to-post **advertisement images** for Facebook, Messenge
 Garage-Sale/
 ├── index.html                  ← the whole website (all the text lives here)
 ├── styles.css                  ← the colours, fonts and layout
-├── script.js                   ← countdown, share buttons, map links
+├── script.js                   ← countdown, map links, copy-address button
 ├── site.webmanifest            ← name + icons when saved to a phone home screen
 ├── .nojekyll                   ← tells GitHub Pages to serve the files as-is
 ├── README.md                   ← this file
@@ -28,7 +28,7 @@ Garage-Sale/
 │   ├── garage-sale-ad.png      ← Facebook / Messenger ad  (1200 × 1200, post this one)
 │   ├── garage-sale-poster.svg  ← printable poster (8.5 × 11 in, editable)
 │   ├── garage-sale-poster.png  ← printable poster (2550 × 3300, 300 dpi — print this one)
-│   ├── garage-sale-qr.png      ← QR code pointing at the website
+│   ├── garage-sale-qr.png      ← QR code (printed on the poster)
 │   ├── garage-sale-qr.svg      ← QR code (vector version)
 │   ├── og-image.png            ← preview picture shown when the link is shared
 │   ├── location-illustration.svg / .png ← "garage sale here" drawing
@@ -46,7 +46,7 @@ Garage-Sale/
 ## A. How to test the website on your computer
 
 **The quick way:** open the folder and double-click **`index.html`**. It opens in your browser.
-Everything works this way except the *Copy link* button, which some browsers block on
+Everything works this way except the *Copy address* button, which some browsers block on
 double-clicked files.
 
 **The better way (recommended):** run a tiny local web server. This behaves exactly like
@@ -190,7 +190,7 @@ between the tags. You don't need to understand the tags — just change the word
 | The four information cards | `index.html` → search for `<ul class="cards">` |
 | "What You'll Find" paragraph | `index.html` → search for `class="pitch"` |
 | The item categories (the coloured pills) | `index.html` → search for `id="category-list"` |
-| The helpful notes (cash, bags, parking) | `index.html` → search for `<ul class="notes">` |
+| The helpful notes (cash, bags) | `index.html` → search for `<ul class="notes">` |
 | **The countdown date/time** | `script.js` → `startISO` and `endISO` at the very top |
 | The address used by the map buttons | `script.js` → `address`, `latitude`, `longitude` |
 | Google/Facebook preview text | `index.html` → the `<meta ...>` lines near the top |
@@ -263,7 +263,7 @@ All pictures live in the **`assets`** folder.
 | `assets/garage-sale-ad.png` | Facebook posts, Messenger, Instagram, texting. Square 1200 × 1200 — looks right everywhere. |
 | `assets/garage-sale-poster.png` | Printing. It's letter size (8.5 × 11 in) at 300 dpi, with the QR code on it. |
 | `assets/og-image.png` | Used automatically for the link preview — you don't need to touch it. |
-| `assets/garage-sale-qr.png` | Put on printed signs so people can scan for directions. |
+| `assets/garage-sale-qr.png` | The QR code on its own, if you want it on a hand-made sign. It is already built into the poster. |
 
 **To post on Facebook:** open `assets/garage-sale-ad.png`, save it to your phone or
 computer, then attach it to your post and paste the website link in the text.

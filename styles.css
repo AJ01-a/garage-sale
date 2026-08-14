@@ -12,11 +12,10 @@
      6. Detail cards
      7. Map / Find Us
      8. What You'll Find
-     9. Share + QR
-    10. Final CTA + footer
-    11. Animations
-    12. Bigger screens (media queries)
-    13. Print styles
+     9. Final CTA + footer
+    10. Animations
+    11. Bigger screens (media queries)
+    12. Print styles
    ========================================================================= */
 
 /* ---------- 1. DESIGN TOKENS ---------- */
@@ -127,7 +126,6 @@ ul { margin: 0; padding: 0; list-style: none; }
 .section--details { background: var(--cream); }
 .section--map     { background: var(--cream-deep); }
 .section--find    { background: var(--cream); }
-.section--share   { background: var(--cream-deep); }
 
 .section__kicker {
   text-transform: uppercase;
@@ -629,48 +627,7 @@ ul { margin: 0; padding: 0; list-style: none; }
 }
 .notes__icon { flex: 0 0 auto; font-size: 1.15rem; }
 
-/* ---------- 9. SHARE + QR ---------- */
-.share-grid {
-  display: grid;
-  gap: 1rem;
-}
-.share-card {
-  background: var(--paper);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-lg);
-  padding: 1.4rem 1.25rem;
-  box-shadow: var(--shadow-sm);
-  text-align: center;
-}
-.share-card__title {
-  font-size: .8rem;
-  font-weight: 800;
-  letter-spacing: .12em;
-  text-transform: uppercase;
-  color: var(--ink-soft);
-  margin-bottom: 1rem;
-}
-.qr {
-  width: min(240px, 70%);
-  margin: 0 auto;
-  border-radius: 14px;
-  border: 1px solid var(--line);
-  padding: 8px;
-  background: #fff;
-}
-.share-card__note {
-  margin: .9rem 0 0;
-  font-size: .86rem;
-  color: var(--ink-soft);
-}
-.share-card__actions {
-  display: grid;
-  gap: .6rem;
-}
-/* These sit in a half-width column, so keep the labels on one line */
-.share-card__actions .btn { font-size: .95rem; padding-inline: .85rem; }
-
-/* ---------- 10. FINAL CTA + FOOTER ---------- */
+/* ---------- 9. FINAL CTA + FOOTER ---------- */
 .final-cta {
   background: var(--navy);
   color: #fff;
@@ -707,7 +664,7 @@ ul { margin: 0; padding: 0; list-style: none; }
 .site-footer a { color: var(--yellow); }
 .site-footer a:hover { color: #fff; }
 
-/* ---------- 11. ANIMATIONS ---------- */
+/* ---------- 10. ANIMATIONS ---------- */
 @keyframes flag-sway {
   0%, 100% { transform: rotate(-2.5deg); }
   50%      { transform: rotate(2.5deg); }
@@ -738,7 +695,7 @@ ul { margin: 0; padding: 0; list-style: none; }
   .btn:hover, .card:hover { transform: none; }
 }
 
-/* ---------- 12. BIGGER SCREENS ---------- */
+/* ---------- 11. BIGGER SCREENS ---------- */
 
 /* Very small phones (320–419px): make room so all four nav links fit
    on screen instead of needing to be scrolled sideways. */
@@ -762,7 +719,6 @@ ul { margin: 0; padding: 0; list-style: none; }
   .hero__cta { justify-content: center; grid-template-columns: repeat(2, minmax(0, 265px)); margin-inline: auto; }
   .cards { grid-template-columns: repeat(2, 1fr); }
   .map-card__actions { grid-template-columns: repeat(2, 1fr); }
-  .share-card__actions { grid-template-columns: repeat(2, 1fr); }
   .countdown__grid { gap: .6rem; }
   .countdown { padding: 1.35rem 1.25rem 1.5rem; }
 }
@@ -780,7 +736,6 @@ ul { margin: 0; padding: 0; list-style: none; }
   .countdown { max-width: 620px; margin-inline: auto; margin-bottom: 2rem; }
   .map-frame { aspect-ratio: 16 / 9; }
   .map-card__body { padding: 1.75rem; }
-  .share-grid { grid-template-columns: 1fr 1fr; align-items: start; }
   .hero__wave svg { height: 64px; }
   .bunting span { max-width: 44px; height: 32px; }
 }
@@ -797,9 +752,9 @@ ul { margin: 0; padding: 0; list-style: none; }
   .section__lead { font-size: 1.1rem; }
 }
 
-/* ---------- 13. PRINT ---------- */
+/* ---------- 12. PRINT ---------- */
 @media print {
-  .site-header, .hero__cta, .share-grid, .final-cta .btn,
+  .site-header, .hero__cta, .final-cta .btn,
   .map-frame, .bunting, .hero__wave, .toast, .skip-link { display: none !important; }
   body { background: #fff; color: #000; font-size: 12pt; }
   .section, .hero { padding: .5rem 0; }

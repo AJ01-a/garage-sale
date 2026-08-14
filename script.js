@@ -21,8 +21,9 @@ const SITE_CONFIG = {
   longitude:   -99.4602787,
 
   // --- THIS WEBSITE'S ADDRESS --------------------------------------------
-  // Leave as-is until GitHub Pages gives you a real URL, then paste it here
-  // (or run:  python3 tools/set-site-url.py https://aj01-a.github.io/garage-sale/ )
+  // Used by tools/build-assets.py to generate the QR code printed on the
+  // poster, and by the link-preview tags in index.html. If the address ever
+  // changes, run:  python3 tools/set-site-url.py <new-url>
   siteUrl: 'https://aj01-a.github.io/garage-sale/',
 
   // --- MESSAGES -----------------------------------------------------------
@@ -30,8 +31,7 @@ const SITE_CONFIG = {
   labelLive:   'Happening right now',
   labelOver:   'That’s a wrap',
   messageLive: 'THE GARAGE SALE IS OPEN!',
-  messageOver: 'THANK YOU FOR STOPPING BY!',
-  shareText:   'Garage Sale — Saturday, August 15, 2026, 8 AM to 4 PM at 55 Bradley Boulevard, Neepawa MB. Come take a look!'
+  messageOver: 'THANK YOU FOR STOPPING BY!'
 };
 
 /* ========================================================================= */
@@ -148,18 +148,8 @@ const SITE_CONFIG = {
   }
 
   /* ---------------------------------------------------------------------
-     3. SHARING (link, native share sheet, Facebook, text message)
+     3. "COPY ADDRESS" BUTTON
      --------------------------------------------------------------------- */
-  function currentUrl() {
-    const configured = SITE_CONFIG.siteUrl || '';
-    // Before the real URL is filled in, fall back to whatever address the
-    // browser is currently showing.
-    if (!configured || configured.indexOf('YOUR-USERNAME') !== -1) {
-      return window.location.href.split('#')[0];
-    }
-    return configured;
-  }
-
   function toast(message) {
     const el = $('#toast');
     if (!el) return;
@@ -199,51 +189,12 @@ const SITE_CONFIG = {
     toast(ok ? successMessage : text);
   }
 
-  function initSharing() {
-    const url = currentUrl();
-
-    const fb = $('#share-facebook');
-    if (fb) fb.href = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(url);
-
-    const sms = $('#share-sms');
-    if (sms) {
-      // "?&body=" is the form that works on both iPhone and Android.
-      sms.href = 'sms:?&body=' + encodeURIComponent(SITE_CONFIG.shareText + ' ' + url);
-    }
-
-    const copyLink = $('#copy-link');
-    if (copyLink) {
-      copyLink.addEventListener('click', function () {
-        copyText(url, 'Link copied!');
-      });
-    }
-
+  function initCopyAddress() {
     const copyAddress = $('#copy-address');
-    if (copyAddress) {
-      copyAddress.addEventListener('click', function () {
-        copyText(copyAddress.dataset.copy || SITE_CONFIG.address, 'Address copied!');
-      });
-    }
-
-    const shareBtn = $('#share-btn');
-    if (shareBtn) {
-      if (navigator.share) {
-        shareBtn.addEventListener('click', function () {
-          navigator.share({
-            title: 'Garage Sale — August 15, 2026',
-            text: SITE_CONFIG.shareText,
-            url: url
-          }).catch(function () { /* user cancelled — nothing to do */ });
-        });
-      } else {
-        // No share sheet on this device (most desktops) — copy instead.
-        const label = shareBtn.querySelector('.btn__label');
-        if (label) label.textContent = 'Copy link to share';
-        shareBtn.addEventListener('click', function () {
-          copyText(url, 'Link copied!');
-        });
-      }
-    }
+    if (!copyAddress) return;
+    copyAddress.addEventListener('click', function () {
+      copyText(copyAddress.dataset.copy || SITE_CONFIG.address, 'Address copied!');
+    });
   }
 
   /* ---------------------------------------------------------------------
@@ -300,7 +251,7 @@ const SITE_CONFIG = {
   function init() {
     buildMapLinks();
     initCountdown();
-    initSharing();
+    initCopyAddress();
     initReveal();
     initActiveNav();
   }
