@@ -442,16 +442,177 @@ ul { margin: 0; padding: 0; list-style: none; }
   line-height: 1.15;
   color: var(--yellow);
 }
+.countdown__sub {
+  margin: .5rem 0 0;
+  font-size: .98rem;
+  font-weight: 700;
+  color: #F3E9D8;
+}
 .countdown--live { background: var(--green); }
 .countdown--live .countdown__label { color: #EAFBEF; }
 .countdown--live .countdown__status { color: #fff; }
+.countdown--live .countdown__sub { color: #E7F8ED; }
 .countdown--over { background: var(--teal); }
 .countdown--over .countdown__label { color: #E4F6F6; }
 .countdown--over .countdown__status { color: #fff; }
+.countdown--over .countdown__sub { color: #E4F6F6; }
+
+/* The moment the clock hits zero: one short pop, then the door opens. */
+.countdown--zero { animation: cd-pop .65s ease both; }
+.countdown--zero .countdown__num { color: var(--yellow); }
+
+/* ---------- 5b. THE LITTLE GARAGE ----------
+   A gable roof, a wall with the door set into it, and a strip of driveway.
+   All of it is plain CSS boxes — no image to download. */
+.garage {
+  width: min(252px, 76%);
+  margin: 0 auto 1rem;
+}
+.garage__roof {
+  width: 112%;
+  height: 26px;
+  margin: 0 -6%;
+  background: var(--red);
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+/* The wall. Its padding is what shows as the frame around the door. */
+.garage__house {
+  padding: 9px 11px 0;
+  background: #F7E9D2;
+  border: 2px solid #E5D2B4;
+  border-top: 0;
+}
+/* Everything inside is clipped to this box, so the door can slide up out
+   of sight without ever pushing the page around. */
+.garage__opening {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 8 / 5;
+  background: #2A2018;
+  box-shadow: inset 0 3px 5px -2px rgba(43, 33, 24, .55);
+}
+/* Driveway, so the door has something to sit on */
+.garage__drive {
+  height: 9px;
+  border-radius: 0 0 4px 4px;
+  background: linear-gradient(180deg, #CFC2AC 0%, #B7A88F 100%);
+}
+
+/* What you see once the door is up */
+.garage__scene {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  align-content: center;
+  gap: .3rem;
+  padding: .4rem;
+  text-align: center;
+  /* Slightly deeper than the wall, with a shadow under the lintel, so it
+     reads as the inside of the garage and not a blank panel. */
+  background: radial-gradient(125% 115% at 50% 105%, #FDF1DC 0%, #EBD5AF 100%);
+  box-shadow: inset 0 9px 14px -7px rgba(43, 33, 24, .55);
+  color: var(--ink);
+}
+.garage__scene::after {          /* a hint of a table along the floor */
+  content: "";
+  position: absolute;
+  left: 10%; right: 10%; bottom: 9%;
+  height: 5px;
+  border-radius: 3px;
+  background: #D2B78D;
+}
+.garage__sign {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(.8rem, 4.2vw, 1.05rem);
+  line-height: 1.1;
+  color: var(--red-deep);
+}
+.garage__stuff {
+  margin: 0;
+  font-size: clamp(.95rem, 5vw, 1.3rem);
+  line-height: 1.1;
+  letter-spacing: .08em;
+}
+
+/* The roll-up door itself. The slats butt up against each other with a
+   thin seam between them — gaps and rounded corners made it look like a
+   chest of drawers. */
+.garage__door {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-rows: repeat(4, 1fr);
+  background: #FBFAF7;
+  transform: translateY(0);
+  transition: transform 1.05s cubic-bezier(.22, .9, .25, 1);
+}
+.garage__slat {
+  background: linear-gradient(180deg, #FFFFFF 0%, #F2ECE1 55%, #E4DACA 100%);
+  border-bottom: 1px solid #C4B49A;
+}
+.garage__slat:last-of-type { border-bottom: 0; }
+
+/* Row of small windows in the top panel */
+.garage__slat--lights {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7%;
+}
+.garage__slat--lights i {
+  width: 15%;
+  height: 46%;
+  border: 1px solid #B9A88C;
+  border-radius: 2px;
+  background: linear-gradient(150deg, #DCEDF0 0%, #B9D8DE 100%);
+}
+.garage__handle {
+  position: absolute;
+  left: 50%;
+  bottom: 7%;
+  width: 20%;
+  height: 4px;
+  transform: translateX(-50%);
+  border-radius: 2px;
+  background: #9A8A76;
+}
+.garage.is-open .garage__door { transform: translateY(-100%); }
 
 .hero__cta {
   display: grid;
   gap: .7rem;
+}
+
+/* Small "we're in the driveway" note, only shown while the sale is on */
+.hero__open-note {
+  margin: 1.1rem auto 0;
+  max-width: 34ch;
+  background: rgba(47, 125, 79, .1);
+  border: 2px dashed var(--green);
+  border-radius: var(--radius);
+  padding: .7rem 1rem;
+  font-size: .98rem;
+  font-weight: 700;
+  color: #1D5B36;
+}
+
+/* While the sale is open, the Get Directions buttons breathe gently.
+   Only the shadow moves, so hovering still lifts the button normally. */
+.sale-open #directions-hero,
+.sale-open #directions-map { animation: cta-glow 2.9s ease-in-out infinite; }
+.sale-open #directions-final { animation: cta-glow-invert 2.9s ease-in-out infinite; }
+
+/* Confetti canvas. Fixed and click-through, so it can never add a
+   scrollbar or sit in front of a button. */
+.confetti {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 150;
 }
 
 .hero__wave { line-height: 0; }
@@ -673,6 +834,21 @@ ul { margin: 0; padding: 0; list-style: none; }
   0%, 100% { opacity: 1;  transform: scale(1); }
   50%      { opacity: .45; transform: scale(.82); }
 }
+/* The countdown's one-off "we hit zero" pop */
+@keyframes cd-pop {
+  0%   { transform: scale(1);     box-shadow: var(--shadow); }
+  45%  { transform: scale(1.045); box-shadow: 0 0 0 7px rgba(255, 193, 69, .3), var(--shadow); }
+  100% { transform: scale(1);     box-shadow: var(--shadow); }
+}
+/* Gentle "come now" glow on the Get Directions buttons during the sale */
+@keyframes cta-glow {
+  0%, 100% { box-shadow: var(--shadow); }
+  50%      { box-shadow: 0 0 0 9px rgba(228, 87, 46, .17), var(--shadow); }
+}
+@keyframes cta-glow-invert {
+  0%, 100% { box-shadow: var(--shadow); }
+  50%      { box-shadow: 0 0 0 9px rgba(255, 193, 69, .26), var(--shadow); }
+}
 
 /* Fade-in-on-scroll. Only hidden when JavaScript is running (the `.js` class),
    so the content is never invisible if a script fails to load. */
@@ -693,6 +869,12 @@ ul { margin: 0; padding: 0; list-style: none; }
   }
   .reveal { opacity: 1; transform: none; }
   .btn:hover, .card:hover { transform: none; }
+  /* The garage still shows the right state, it just doesn't slide, and the
+     "come now" glow and the confetti are switched off entirely. */
+  .garage__door { transition: none; }
+  .sale-open #directions-hero,
+  .sale-open #directions-map,
+  .sale-open #directions-final { animation: none; }
 }
 
 /* ---------- 11. BIGGER SCREENS ---------- */
@@ -734,6 +916,8 @@ ul { margin: 0; padding: 0; list-style: none; }
   .hero__fact:last-child { grid-column: auto; }
   .hero__fact { padding: 1rem 1.15rem; text-align: center; }
   .countdown { max-width: 620px; margin-inline: auto; margin-bottom: 2rem; }
+  .garage { width: 292px; }
+  .garage__roof { height: 30px; }
   .map-frame { aspect-ratio: 16 / 9; }
   .map-card__body { padding: 1.75rem; }
   .hero__wave svg { height: 64px; }
@@ -755,7 +939,8 @@ ul { margin: 0; padding: 0; list-style: none; }
 /* ---------- 12. PRINT ---------- */
 @media print {
   .site-header, .hero__cta, .final-cta .btn,
-  .map-frame, .bunting, .hero__wave, .toast, .skip-link { display: none !important; }
+  .map-frame, .bunting, .hero__wave, .toast, .skip-link,
+  .garage, .confetti { display: none !important; }
   body { background: #fff; color: #000; font-size: 12pt; }
   .section, .hero { padding: .5rem 0; }
   /* Show everything instantly. Without killing the transition, the fade-in

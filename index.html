@@ -145,6 +145,34 @@
 
       <!-- ================= COUNTDOWN ================= -->
       <div class="countdown" id="countdown" role="region" aria-labelledby="countdown-label">
+
+        <!-- Little garage. Its door is closed until the sale starts, then
+             JavaScript adds the class "is-open" and it rolls up. Purely
+             decorative, so screen readers skip it. -->
+        <div class="garage" id="garage" aria-hidden="true">
+          <div class="garage__roof"></div>
+          <div class="garage__house">
+            <div class="garage__opening">
+              <div class="garage__scene">
+                <p class="garage__sign">GARAGE SALE!</p>
+                <p class="garage__stuff">🛍️ 🧺 🪑 📦</p>
+              </div>
+              <div class="garage__door">
+                <!-- The row of little windows is what makes it read as a
+                     garage door rather than a cupboard. -->
+                <span class="garage__slat garage__slat--lights">
+                  <i></i><i></i><i></i><i></i>
+                </span>
+                <span class="garage__slat"></span>
+                <span class="garage__slat"></span>
+                <span class="garage__slat"></span>
+                <span class="garage__handle"></span>
+              </div>
+            </div>
+          </div>
+          <div class="garage__drive"></div>
+        </div>
+
         <p class="countdown__label" id="countdown-label">Sale starts in</p>
         <div class="countdown__grid" id="countdown-grid">
           <div class="countdown__unit"><span class="countdown__num" id="cd-days">--</span><span class="countdown__word">Days</span></div>
@@ -154,6 +182,7 @@
         </div>
         <!-- Replaces the numbers on sale day -->
         <p class="countdown__status" id="countdown-status" hidden></p>
+        <p class="countdown__sub" id="countdown-sub" hidden></p>
         <!-- Screen-reader friendly, updates politely instead of every second -->
         <p class="visually-hidden" aria-live="polite" id="countdown-sr"></p>
       </div>
@@ -166,6 +195,11 @@
           <span aria-hidden="true">🗺️</span> See the Map
         </a>
       </div>
+
+      <!-- Only shown while the sale is actually happening -->
+      <p class="hero__open-note" id="open-note" hidden>
+        <span aria-hidden="true">🏠</span> We&rsquo;re open! Look for the garage sale in the driveway.
+      </p>
     </div>
 
     <!-- Decorative wave at the bottom of the hero -->

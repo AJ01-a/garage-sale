@@ -18,7 +18,7 @@ It also comes with ready-to-post **advertisement images** for Facebook, Messenge
 Garage-Sale/
 ├── index.html                  ← the whole website (all the text lives here)
 ├── styles.css                  ← the colours, fonts and layout
-├── script.js                   ← countdown, map links, copy-address button
+├── script.js                   ← countdown, opening celebration, map links, copy button
 ├── site.webmanifest            ← name + icons when saved to a phone home screen
 ├── .nojekyll                   ← tells GitHub Pages to serve the files as-is
 ├── README.md                   ← this file
@@ -69,6 +69,35 @@ the real website.
 **To check the phone layout:** in Chrome or Edge press `F12`, then click the little
 phone/tablet icon (or press `Ctrl + Shift + M`). You can then pick "iPhone SE",
 "Pixel 7", etc. from the dropdown at the top.
+
+### Seeing what the page looks like on sale day
+
+The page has three states — counting down, open, and finished — and it switches between
+them by itself. To look at any of them right now, add one of these to the end of the
+address:
+
+| Add this to the address | What you'll see |
+| --- | --- |
+| `?preview=before` | Two days to go — the normal countdown |
+| `?preview=open` | Five seconds to go, so you can watch the whole opening: the numbers hit zero, the garage door rolls up, confetti falls, and the card turns into **🎉 GARAGE SALE IS OPEN! 🎉** |
+| `?preview=live` | Arriving in the middle of the sale |
+| `?preview=ending` | Ten seconds before 4:00 PM, so you can watch it close |
+| `?preview=ended` | After the sale — **👋 Thanks for stopping by!** |
+| `?at=2026-08-15T07:59:55-05:00` | Pretend it is any exact moment you like |
+
+For example: **http://localhost:8000/?preview=open**
+
+This is only for you. A plain visit to the website — with nothing after the address —
+always uses the real clock, so nobody sees these unless they type one in on purpose.
+If you'd rather it didn't exist at all, delete the `previewOffset` function in
+`script.js` and the one line that calls it (search for `previewOffset`).
+
+The opening celebration plays **once per visit**. If someone refreshes the page during
+the sale they just see "GARAGE SALE IS OPEN!" without the animation replaying. To watch
+it again while testing, open a new tab (or close and reopen the browser).
+
+Anyone whose phone or computer is set to "reduce motion" gets the same information with
+the door already open, no confetti and no movement.
 
 ---
 
@@ -192,6 +221,8 @@ between the tags. You don't need to understand the tags — just change the word
 | The item categories (the coloured pills) | `index.html` → search for `id="category-list"` |
 | The helpful notes (cash, bags) | `index.html` → search for `<ul class="notes">` |
 | **The countdown date/time** | `script.js` → `startISO` and `endISO` at the very top |
+| The wording on sale day ("GARAGE SALE IS OPEN!", "Thanks for stopping by!") | `script.js` → `messageLive`, `subLive`, `messageOver`, `subOver` |
+| The "look for us in the driveway" note | `index.html` → search for `open-note` |
 | The address used by the map buttons | `script.js` → `address`, `latitude`, `longitude` |
 | Google/Facebook preview text | `index.html` → the `<meta ...>` lines near the top |
 
@@ -278,7 +309,11 @@ computer, then attach it to your post and paste the website link in the text.
 
 * Semantic HTML with a proper heading order, skip link, and visible keyboard focus rings.
 * All colours meet WCAG AA contrast; buttons are at least 48 px tall for easy tapping.
-* Animations are switched off automatically for anyone using "reduce motion".
+* Animations are switched off automatically for anyone using "reduce motion" — including
+  the garage door and the confetti, which are skipped entirely while the page still shows
+  the correct "open" or "ended" message.
+* The confetti is about 40 lines of plain JavaScript drawing on one `<canvas>`, which
+  deletes itself after four seconds. No library, nothing left running afterwards.
 * No frameworks and no web fonts — the whole page is well under 100 KB of code, plus a
   lazy-loaded map that only loads when you scroll to it.
 * The map is OpenStreetMap's official embed, which is free to use and correctly credited.
@@ -294,4 +329,5 @@ computer, then attach it to your post and paste the website link in the text.
 | Images don't appear | Check the `assets` folder uploaded and file names match exactly, including capitals. |
 | Facebook preview shows the wrong thing | Do section **E**, then paste your link into <https://developers.facebook.com/tools/debug/> and click *Scrape Again*. |
 | Countdown says the wrong thing | Check `startISO` / `endISO` in `script.js`. |
+| The garage door / confetti didn't play again | That's on purpose — it plays once per visit. Open a new tab to see it again, or use `?preview=open` (section **A**). |
 | QR code goes to the wrong page | Re-run `python3 tools/set-site-url.py <your link>`. |
