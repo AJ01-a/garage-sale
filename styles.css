@@ -414,6 +414,10 @@ ul { margin: 0; padding: 0; list-style: none; }
   grid-template-columns: repeat(4, 1fr);
   gap: .4rem;
 }
+/* Overnight the sale is only hours away, so the days box is dropped and
+   those hours are counted in the hours box instead. */
+.countdown__grid--hms { grid-template-columns: repeat(3, 1fr); }
+.countdown__grid--hms .countdown__unit--days { display: none; }
 .countdown__unit {
   background: rgba(255, 255, 255, .1);
   border-radius: 14px;
@@ -456,6 +460,15 @@ ul { margin: 0; padding: 0; list-style: none; }
 .countdown--over .countdown__label { color: #E4F6F6; }
 .countdown--over .countdown__status { color: #fff; }
 .countdown--over .countdown__sub { color: #E4F6F6; }
+
+/* Overnight, between two days of the sale. Keeps the navy "waiting" card,
+   with the headline on top and the countdown to tomorrow underneath. */
+.countdown--next .countdown__sub {
+  max-width: 38ch;
+  margin-inline: auto;
+  color: #F6EBD6;
+}
+.countdown__label--next { margin: 1rem 0 .7rem; }
 
 /* The moment the clock hits zero: one short pop, then the door opens. */
 .countdown--zero { animation: cd-pop .65s ease both; }
