@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
      width="850" height="1100" viewBox="0 0 850 1100" role="img" aria-labelledby="poster-title">
-  <title id="poster-title">Printable garage sale poster — Saturday and Sunday, August 15 and 16, 8 AM to 4 PM, 55 Bradley Boulevard, Neepawa MB</title>
+  <title id="poster-title">Printable garage sale poster — Saturday, August 22, 8 AM to 4 PM, 55 Bradley Boulevard, Neepawa MB</title>
 
   <defs>
     <linearGradient id="pbg" x1="0" y1="0" x2="0" y2="1">
@@ -50,8 +50,8 @@
     <path d="M86 430 L764 430 L764 524 L86 524 Z" fill="#17363F"/>
     <path d="M86 430 L52 477 L86 524 Z" fill="#122A31"/>
     <path d="M764 430 L798 477 L764 524 Z" fill="#122A31"/>
-    <text class="disp" x="425" y="472" text-anchor="middle" font-size="38" fill="#FFFFFF">SATURDAY &amp; SUNDAY</text>
-    <text class="disp" x="425" y="513" text-anchor="middle" font-size="38" fill="#FFC145">AUGUST 15 &amp; 16</text>
+    <text class="disp" x="425" y="472" text-anchor="middle" font-size="38" fill="#FFFFFF">SATURDAY</text>
+    <text class="disp" x="425" y="513" text-anchor="middle" font-size="38" fill="#FFC145">AUGUST 22, 2026</text>
   </g>
 
   <!-- Time -->

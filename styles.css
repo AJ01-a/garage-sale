@@ -1,5 +1,7 @@
 /* =========================================================================
    GARAGE SALE — 55 Bradley Boulevard, Neepawa MB
+   Saturday, August 22, 2026 · 8:00 AM – 4:00 PM
+
    Plain CSS, no frameworks. Written mobile-first (small screens first,
    then bigger screens are handled inside the @media blocks near the bottom).
 
@@ -8,46 +10,64 @@
      2. Base + reset
      3. Reusable pieces (container, buttons, toast)
      4. Header / navigation
-     5. Hero + countdown
-     6. Detail cards
-     7. Map / Find Us
-     8. What You'll Find
-     9. Final CTA + footer
-    10. Animations
-    11. Bigger screens (media queries)
-    12. Print styles
+     5. Hero (background, status pill, facts)
+     6. Countdown + the little garage
+     7. Detail cards
+     8. Map / Find Us
+     9. What You'll Find + the surprise machine
+    10. Final CTA + footer
+    11. Keyframes + scroll reveal
+    12. Bigger screens (media queries)
+    13. Reduced motion
+    14. Print styles
    ========================================================================= */
 
 /* ---------- 1. DESIGN TOKENS ---------- */
 :root {
-  /* Colours */
-  --cream:      #FFF7EC;
-  --cream-deep: #FCEBD5;
+  /* Warm daylight palette */
+  --cream:      #FFF8EF;
+  --cream-deep: #FBEBD7;
   --paper:      #FFFFFF;
-  --ink:        #2B2118;
-  --ink-soft:   #6B5B4C;
-  --line:       #EADAC4;
+  --ink:        #241C15;
+  --ink-soft:   #6A5A4B;
+  --line:       #EBDCC6;
 
-  --red:        #E4572E;   /* big display accents only */
+  /* Dusk palette — the hero, the closing panel and the footer */
+  --night:      #101E26;
+  --night-2:    #0A151B;
+  --night-3:    #162A33;
+  --on-dark:      #FFF6E9;
+  --on-dark-soft: #C7B8A6;
+
+  /* Accents */
+  --red:        #F0562B;   /* big display accents only */
   --red-btn:    #C33C17;   /* buttons — darker so white text passes contrast */
   --red-deep:   #A13112;
-  --yellow:     #FFC145;
-  --yellow-soft:#FFE29A;
-  --teal:       #126E73;
+  --amber:      #FFB627;
+  --amber-lite: #FFD98A;
+  --amber-soft: #FFE9B8;
+  --teal:       #0E7C7B;
+  --teal-deep:  #0A5F5E;
   --green:      #2F7D4F;
-  --navy:       #17363F;
+  --green-lite: #6EE7A5;
 
-  /* Typography — a heavy system stack, so nothing has to be downloaded */
-  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --font-display: "Arial Black", "Helvetica Neue", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  /* Type — Outfit if it downloads, otherwise the system stack. Both are
+     geometric sans faces, so the layout does not shift much either way. */
+  --font-sans:    "Outfit", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-display: "Outfit", system-ui, -apple-system, "Segoe UI Variable Display", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 
-  /* Spacing + shape */
+  /* Shape + depth */
   --radius:     18px;
   --radius-lg:  26px;
-  --shadow-sm:  0 2px 6px rgba(43, 33, 24, .07);
-  --shadow:     0 10px 24px -12px rgba(43, 33, 24, .28);
-  --shadow-lg:  0 24px 48px -20px rgba(43, 33, 24, .38);
+  --radius-xl:  32px;
+  --shadow-sm:  0 2px 8px rgba(36, 28, 21, .07);
+  --shadow:     0 12px 28px -14px rgba(36, 28, 21, .32);
+  --shadow-lg:  0 28px 56px -24px rgba(36, 28, 21, .42);
+  --ring:       0 0 0 3px rgba(240, 86, 43, .22);
   --header-h:   62px;
+
+  /* Film grain, drawn by the browser — no image to download */
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
 /* ---------- 2. BASE + RESET ---------- */
@@ -60,7 +80,7 @@
 
 html {
   scroll-behavior: smooth;
-  scroll-padding-top: calc(var(--header-h) + 12px);
+  scroll-padding-top: calc(var(--header-h) + 14px);
   -webkit-text-size-adjust: 100%;
 }
 
@@ -72,31 +92,35 @@ body {
   font-size: 17px;
   line-height: 1.6;
   overflow-x: hidden; /* safety net: nothing should ever scroll sideways */
+  -webkit-font-smoothing: antialiased;
 }
 
-h1, h2, h3 { line-height: 1.1; margin: 0 0 .5em; }
+h1, h2, h3 { line-height: 1.08; margin: 0 0 .5em; font-weight: 800; }
 p { margin: 0 0 1em; }
 img, svg, iframe { max-width: 100%; }
 img { height: auto; display: block; }
 
-a { color: var(--teal); }
+a { color: var(--teal-deep); }
 a:hover { color: var(--red-deep); }
 
 ul { margin: 0; padding: 0; list-style: none; }
 
 /* Visible focus ring for keyboard users */
 :focus-visible {
-  outline: 3px solid var(--navy);
+  outline: 3px solid var(--red);
   outline-offset: 3px;
-  border-radius: 6px;
+  border-radius: 8px;
 }
+.hero :focus-visible,
+.final-cta :focus-visible,
+.site-footer :focus-visible { outline-color: var(--amber); }
 
 .skip-link {
   position: absolute;
   left: -9999px;
   top: 0;
   z-index: 999;
-  background: var(--navy);
+  background: var(--night);
   color: #fff;
   padding: .75rem 1.25rem;
   border-radius: 0 0 12px 0;
@@ -118,91 +142,124 @@ ul { margin: 0; padding: 0; list-style: none; }
 
 /* ---------- 3. REUSABLE PIECES ---------- */
 .container {
-  width: min(1120px, 100% - 2rem);
+  width: min(1140px, 100% - 2rem);
   margin-inline: auto;
 }
 
-.section { padding: clamp(2.75rem, 8vw, 4.75rem) 0; }
+.section { padding: clamp(3rem, 9vw, 5.5rem) 0; }
 .section--details { background: var(--cream); }
 .section--map     { background: var(--cream-deep); }
 .section--find    { background: var(--cream); }
 
 .section__kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
   text-transform: uppercase;
-  letter-spacing: .14em;
-  font-size: .78rem;
+  letter-spacing: .16em;
+  font-size: .74rem;
   font-weight: 800;
   color: var(--red-deep);
-  margin: 0 0 .35rem;
+  margin: 0 0 .5rem;
+}
+.section__kicker::before {
+  content: "";
+  width: 26px; height: 2px;
+  background: currentColor;
+  border-radius: 2px;
 }
 .section__title {
   font-family: var(--font-display);
-  font-size: clamp(1.75rem, 6.2vw, 2.6rem);
-  letter-spacing: -.01em;
-  margin-bottom: .4em;
+  font-weight: 900;
+  font-size: clamp(1.9rem, 6.4vw, 2.9rem);
+  letter-spacing: -.02em;
+  margin-bottom: .45em;
+  text-wrap: balance;
 }
 .section__lead {
   font-size: 1.05rem;
   color: var(--ink-soft);
-  max-width: 62ch;
-  margin-bottom: 2rem;
+  max-width: 60ch;
+  margin-bottom: 2.25rem;
 }
 
 /* Buttons — all at least 48px tall so they're easy to tap */
 .btn {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: .5rem;
   min-height: 48px;
-  padding: .7rem 1.25rem;
+  padding: .7rem 1.3rem;
   border: 2px solid transparent;
   border-radius: 999px;
   font: inherit;
-  font-weight: 800;
+  font-weight: 700;
+  letter-spacing: .01em;
   text-decoration: none;
   text-align: center;
   cursor: pointer;
-  transition: transform .15s ease, box-shadow .15s ease, background-color .15s ease;
+  overflow: hidden;
+  transition: transform .18s cubic-bezier(.2,.8,.3,1),
+              box-shadow .18s ease,
+              background-color .18s ease,
+              border-color .18s ease,
+              color .18s ease;
 }
-.btn:hover { transform: translateY(-2px); }
-.btn:active { transform: translateY(0); }
+/* A soft sheen that sweeps across on hover */
+.btn::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 32%, rgba(255,255,255,.42) 50%, transparent 68%);
+  transform: translateX(-120%);
+  transition: transform .55s ease;
+  pointer-events: none;
+}
+.btn:hover::after, .btn:focus-visible::after { transform: translateX(120%); }
+.btn:hover  { transform: translateY(-2px); }
+.btn:active { transform: translateY(0) scale(.985); }
+.btn > span { position: relative; }
 
 .btn--primary {
   background: var(--red-btn);
   color: #fff;
-  box-shadow: var(--shadow);
+  box-shadow: 0 10px 22px -12px rgba(163, 49, 18, .9);
 }
-.btn--primary:hover { background: var(--red-deep); color: #fff; }
+.btn--primary:hover { background: var(--red-deep); color: #fff; box-shadow: 0 16px 28px -14px rgba(163, 49, 18, .95); }
 
-.btn--ghost {
-  background: rgba(255, 255, 255, .92);
-  color: var(--navy);
-  border-color: var(--navy);
+/* Frosted button, used on the dark hero */
+.btn--glass {
+  background: rgba(255, 255, 255, .1);
+  color: var(--on-dark);
+  border-color: rgba(255, 246, 233, .38);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
-.btn--ghost:hover { background: #fff; color: var(--navy); }
+.btn--glass:hover {
+  background: rgba(255, 255, 255, .18);
+  border-color: var(--amber);
+  color: #fff;
+}
 
 .btn--soft {
   background: var(--paper);
   color: var(--ink);
   border-color: var(--line);
   box-shadow: var(--shadow-sm);
-  font-weight: 700;
 }
-.btn--soft:hover { border-color: var(--red); color: var(--red-deep); }
+.btn--soft:hover { border-color: var(--red); color: var(--red-deep); box-shadow: var(--shadow); }
 
 .btn--invert {
-  background: var(--yellow);
+  background: var(--amber);
   color: #3A2A12;
-  box-shadow: var(--shadow);
+  box-shadow: 0 12px 26px -14px rgba(255, 182, 39, .95);
 }
-.btn--invert:hover { background: #FFD070; color: #3A2A12; }
+.btn--invert:hover { background: #FFC85A; color: #3A2A12; }
 
-.btn--lg {
-  font-size: 1.08rem;
-  padding: .95rem 1.6rem;
-  min-height: 54px;
-}
+.btn--lg { font-size: 1.05rem; padding: .95rem 1.7rem; min-height: 54px; }
+.btn--sm { font-size: .86rem; padding: .5rem 1rem; min-height: 42px; }
 
 /* Little toast that appears after "copy" */
 .toast {
@@ -210,7 +267,7 @@ ul { margin: 0; padding: 0; list-style: none; }
   left: 50%;
   bottom: 22px;
   transform: translateX(-50%) translateY(10px);
-  background: var(--navy);
+  background: var(--night);
   color: #fff;
   padding: .7rem 1.15rem;
   border-radius: 999px;
@@ -229,13 +286,49 @@ ul { margin: 0; padding: 0; list-style: none; }
   position: sticky;
   top: 0;
   z-index: 100;
-  background: rgba(255, 247, 236, .93);
-  backdrop-filter: blur(8px);
-  border-bottom: 1px solid var(--line);
+  background: transparent;
+  border-bottom: 1px solid transparent;
+  transition: background-color .3s ease, border-color .3s ease, box-shadow .3s ease;
+}
+/* While the bar is transparent it floats over the hero, whose colour washes
+   move. This soft scrim keeps the brand and the links readable wherever the
+   washes happen to be, and fades away once the solid bar takes over. */
+.site-header::before {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; top: 0;
+  height: calc(var(--header-h) + 28px);
+  z-index: -1;
+  background: linear-gradient(180deg, rgba(10, 21, 27, .66), rgba(10, 21, 27, 0));
+  pointer-events: none;
+  transition: opacity .3s ease;
+}
+.site-header.is-stuck::before,
+.site-header.is-open::before { opacity: 0; }
+/* Once you scroll off the hero it turns into a solid cream bar. The same
+   look is used whenever the mobile menu is open, so the drop-down panel
+   and the bar always match. */
+.site-header.is-stuck {
+  background: rgba(255, 248, 239, .92);
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  border-bottom-color: var(--line);
+  box-shadow: 0 6px 20px -18px rgba(36, 28, 21, .8);
+}
+/* While the drop-down panel is showing, the bar is fully opaque and the
+   frosting is switched off. A backdrop-filter on the bar makes it a
+   "backdrop root", and the panel hanging below it is then not painted
+   reliably — an opaque bar avoids the whole problem and reads better. */
+.site-header.is-open {
+  background: var(--cream);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-bottom-color: var(--line);
+  box-shadow: 0 6px 20px -18px rgba(36, 28, 21, .8);
 }
 
 .nav {
-  width: min(1120px, 100% - 1.5rem);
+  width: min(1140px, 100% - 1.5rem);
   margin-inline: auto;
   min-height: var(--header-h);
   display: flex;
@@ -247,58 +340,240 @@ ul { margin: 0; padding: 0; list-style: none; }
 .nav__brand {
   display: inline-flex;
   align-items: center;
-  gap: .4rem;
+  gap: .45rem;
   padding: .55rem .15rem;   /* keeps the tap area comfortably large */
   font-family: var(--font-display);
-  font-size: 1rem;
-  color: var(--ink);
+  font-weight: 900;
+  font-size: 1.02rem;
+  letter-spacing: -.01em;
+  color: var(--on-dark);
   text-decoration: none;
   white-space: nowrap;
+  transition: color .3s ease;
 }
-.nav__brand-icon { font-size: 1.15rem; }
+.site-header.is-stuck .nav__brand,
+.site-header.is-open   .nav__brand { color: var(--ink); }
+.nav__brand-icon {
+  font-size: 1.2rem;
+  display: inline-block;
+  transition: transform .3s cubic-bezier(.2,.8,.3,1);
+}
+.nav__brand:hover .nav__brand-icon { transform: rotate(-12deg) scale(1.12); }
 
 .nav__links {
-  display: flex;
+  display: none;                 /* phones use the drop-down panel below */
   align-items: center;
-  gap: .25rem;
-  overflow-x: auto;              /* tiny phones: scroll the links, never the page */
-  scrollbar-width: none;
-  -ms-overflow-style: none;
+  gap: .15rem;
 }
-.nav__links::-webkit-scrollbar { display: none; }
-
 .nav__links a {
+  position: relative;
   display: block;
-  padding: .45rem .55rem;
-  font-size: .84rem;
-  font-weight: 700;
-  color: var(--ink-soft);
+  padding: .5rem .7rem;
+  font-size: .92rem;
+  font-weight: 600;
+  color: rgba(255, 246, 233, .86);
   text-decoration: none;
   border-radius: 999px;
   white-space: nowrap;
+  transition: color .2s ease, background-color .2s ease;
 }
-.nav__links a:hover,
-.nav__links a.is-active { color: var(--red-deep); background: rgba(228, 87, 46, .1); }
+.site-header.is-stuck .nav__links a,
+.site-header.is-open   .nav__links a { color: var(--ink-soft); }
+/* The little underline that grows in on hover / for the section you're in */
+.nav__links a::after {
+  content: "";
+  position: absolute;
+  left: .7rem; right: .7rem; bottom: .28rem;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--red);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform .25s cubic-bezier(.2,.8,.3,1);
+}
+.nav__links a:hover, .nav__links a.is-active { color: var(--amber); }
+.site-header.is-stuck .nav__links a:hover,
+.site-header.is-stuck .nav__links a.is-active,
+.site-header.is-open   .nav__links a:hover,
+.site-header.is-open   .nav__links a.is-active { color: var(--red-deep); }
+.nav__links a:hover::after, .nav__links a.is-active::after { transform: scaleX(1); }
+
+.nav__end { display: flex; align-items: center; gap: .5rem; }
+/* Icon-only until the full navigation appears at 820px */
+.nav__cta { width: 46px; height: 46px; min-height: 46px; padding: 0; border-radius: 14px; }
+.nav__cta-text { display: none; }
+
+/* Hamburger */
+.nav__toggle {
+  display: inline-grid;
+  place-items: center;
+  width: 46px; height: 46px;
+  padding: 0;
+  border: 1px solid rgba(255, 246, 233, .3);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, .08);
+  color: var(--on-dark);
+  cursor: pointer;
+  transition: background-color .2s ease, border-color .2s ease;
+}
+.site-header.is-stuck .nav__toggle,
+.site-header.is-open   .nav__toggle {
+  border-color: var(--line);
+  background: var(--paper);
+  color: var(--ink);
+}
+.nav__toggle-bars { display: grid; gap: 4px; width: 20px; }
+.nav__toggle-bars i {
+  display: block;
+  height: 2px;
+  border-radius: 2px;
+  background: currentColor;
+  transition: transform .28s cubic-bezier(.2,.8,.3,1), opacity .2s ease;
+}
+.nav__toggle[aria-expanded="true"] .nav__toggle-bars i:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+.nav__toggle[aria-expanded="true"] .nav__toggle-bars i:nth-child(2) { opacity: 0; }
+.nav__toggle[aria-expanded="true"] .nav__toggle-bars i:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+/* The open drop-down panel on phones */
+.site-header.is-open .nav__links {
+  display: grid;
+  position: absolute;
+  left: 0; right: 0;
+  top: 100%;
+  gap: .1rem;
+  padding: .5rem .75rem 1rem;
+  background: var(--cream);
+  border-bottom: 1px solid var(--line);
+  box-shadow: var(--shadow);
+  animation: menu-in .22s ease both;
+}
+.site-header.is-open .nav__links a {
+  padding: .85rem 1rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  border-radius: 14px;
+}
+.site-header.is-open .nav__links a::after { display: none; }
+.site-header.is-open .nav__links a:hover,
+.site-header.is-open .nav__links a.is-active { background: rgba(240, 86, 43, .09); }
+
+/* Reading progress along the bottom edge of the header */
+.progress {
+  position: absolute;
+  left: 0; right: 0; bottom: -1px;
+  height: 2px;
+  pointer-events: none;
+}
+.progress span {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, var(--amber), var(--red));
+  transition: width .1s linear;
+}
 
 /* ---------- 5. HERO ---------- */
 .hero {
   position: relative;
   isolation: isolate;
-  padding: 2.25rem 0 0;
-  background:
-    radial-gradient(120% 85% at 82% -8%, rgba(255, 193, 69, .55), transparent 58%),
-    radial-gradient(110% 80% at 6% 4%, rgba(228, 87, 46, .18), transparent 55%),
-    linear-gradient(178deg, #FFF9F0 0%, #FDEBD2 100%);
+  margin-top: calc(var(--header-h) * -1);   /* the header floats over the top */
+  padding: calc(var(--header-h) + 1.25rem) 0 0;
+  color: var(--on-dark);
+  background: var(--night);
   overflow: hidden;
+}
+
+/* --- the animated background --- */
+.hero__bg { position: absolute; inset: 0; z-index: -2; overflow: hidden; }
+
+/* Three soft colour washes that drift slowly. They are plain radial
+   gradients rather than blurred boxes, which costs the phone far less.
+   Kept fairly transparent — they should read as light thrown onto the dark
+   background, not as paint covering it. */
+.blob {
+  position: absolute;
+  display: block;
+  border-radius: 50%;
+  will-change: transform;
+}
+.blob--1 {
+  width: 62vmax; height: 62vmax;
+  top: -28vmax; left: -18vmax;
+  background: radial-gradient(circle at 50% 50%, rgba(240, 86, 43, .5) 0%, rgba(240, 86, 43, .12) 38%, transparent 62%);
+  animation: drift-a 26s ease-in-out infinite;
+}
+.blob--2 {
+  width: 52vmax; height: 52vmax;
+  top: -20vmax; right: -14vmax;
+  background: radial-gradient(circle at 50% 50%, rgba(255, 182, 39, .46) 0%, rgba(255, 182, 39, .1) 40%, transparent 64%);
+  animation: drift-b 32s ease-in-out infinite;
+}
+.blob--3 {
+  width: 58vmax; height: 58vmax;
+  bottom: -30vmax; right: -12vmax;
+  background: radial-gradient(circle at 50% 50%, rgba(20, 160, 158, .42) 0%, rgba(20, 160, 158, .1) 42%, transparent 66%);
+  animation: drift-c 38s ease-in-out infinite;
+}
+
+/* Sits over the washes and pulls the middle and the foot of the hero back
+   down to a deep, readable navy. Without it the three colours overlap into
+   a flat brown. */
+.hero__bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(90% 62% at 50% 46%, rgba(16, 30, 38, .72) 0%, rgba(16, 30, 38, .3) 55%, transparent 78%),
+    linear-gradient(180deg, rgba(16, 30, 38, 0) 42%, rgba(13, 25, 32, .78) 82%, rgba(10, 21, 27, .96) 100%);
+}
+
+/* Faint blueprint grid, fading out towards the bottom */
+.hero__grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(to right, rgba(255, 246, 233, .07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 246, 233, .07) 1px, transparent 1px);
+  background-size: 64px 64px;
+  -webkit-mask-image: radial-gradient(120% 90% at 50% 12%, #000 20%, transparent 78%);
+          mask-image: radial-gradient(120% 90% at 50% 12%, #000 20%, transparent 78%);
+}
+
+/* Film grain — takes the flatness off the gradients */
+.hero__grain {
+  position: absolute;
+  inset: -50%;
+  background-image: var(--grain);
+  opacity: .16;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+
+/* Floating garage-sale objects. `--px` / `--py` are nudged by the pointer
+   (see script.js) for a gentle parallax; everything else is CSS. */
+.floaters { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
+.floater {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  font-size: var(--size, 2rem);
+  line-height: 1;
+  opacity: .34;
+  filter: drop-shadow(0 8px 18px rgba(0, 0, 0, .45));
+  transform: translate(-50%, -50%) translate(var(--px, 0px), var(--py, 0px));
+  animation: bob 9s ease-in-out infinite;
+  animation-delay: var(--d, 0s);
+  will-change: transform;
 }
 
 /* Decorative flag bunting across the top */
 .bunting {
+  position: relative;
   display: flex;
   justify-content: space-between;
   gap: 2px;
   padding: 0 4px;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.75rem;
 }
 .bunting span {
   flex: 1 1 0;
@@ -307,179 +582,330 @@ ul { margin: 0; padding: 0; list-style: none; }
   clip-path: polygon(0 0, 100% 0, 50% 100%);
   transform-origin: top center;
   animation: flag-sway 4.5s ease-in-out infinite;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, .35));
 }
 .bunting span:nth-child(4n+1) { background: var(--red); }
-.bunting span:nth-child(4n+2) { background: var(--yellow); }
-.bunting span:nth-child(4n+3) { background: var(--teal); }
-.bunting span:nth-child(4n+4) { background: var(--green); }
+.bunting span:nth-child(4n+2) { background: var(--amber); }
+.bunting span:nth-child(4n+3) { background: #2FA8A6; }
+.bunting span:nth-child(4n+4) { background: #55B77C; }
 .bunting span:nth-child(odd)  { animation-delay: -1.2s; }
 .bunting span:nth-child(3n)   { animation-delay: -2.4s; }
 
 .hero__inner { padding-bottom: 3.5rem; text-align: center; }
 
-.hero__eyebrow {
+/* --- live status pill --- */
+.status {
   display: inline-flex;
   align-items: center;
-  gap: .5rem;
-  background: var(--paper);
-  border: 1px solid var(--line);
-  color: var(--ink-soft);
-  font-size: .8rem;
+  gap: .55rem;
+  background: rgba(255, 255, 255, .08);
+  border: 1px solid rgba(255, 246, 233, .22);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: var(--amber-lite);
+  font-size: .76rem;
   font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: .08em;
-  padding: .4rem .85rem;
+  letter-spacing: .14em;
+  padding: .45rem 1rem;
   border-radius: 999px;
-  box-shadow: var(--shadow-sm);
-  margin-bottom: 1rem;
+  margin: 0 0 1.15rem;
 }
-.dot {
-  width: 8px; height: 8px;
+.status__dot {
+  position: relative;
+  width: 9px; height: 9px;
   border-radius: 50%;
-  background: var(--green);
-  animation: pulse 2s ease-in-out infinite;
+  background: currentColor;
+  flex: 0 0 auto;
 }
+/* The ring that pulses outwards while the sale is on */
+.status__dot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0;
+}
+.status[data-state="before"] .status__dot { animation: pulse 2.2s ease-in-out infinite; }
+.status[data-state="live"] {
+  color: var(--green-lite);
+  border-color: rgba(110, 231, 165, .5);
+  background: rgba(110, 231, 165, .12);
+}
+.status[data-state="live"] .status__dot::after { animation: ping 1.8s cubic-bezier(0,0,.2,1) infinite; }
+.status[data-state="over"] { color: #A8B4B9; }
 
 .hero__title {
   font-family: var(--font-display);
   font-weight: 900;
-  font-size: clamp(3rem, 17vw, 7.5rem);
-  line-height: .88;
-  letter-spacing: -.02em;
-  margin: 0 0 .35em;
+  font-size: clamp(3.2rem, 18vw, 8.5rem);
+  line-height: .86;
+  letter-spacing: -.035em;
+  margin: 0 0 .3em;
   text-wrap: balance;
 }
 .hero__title-line { display: block; }
-.hero__title-line:first-child { color: var(--navy); }
+.hero__title-line:first-child {
+  color: transparent;
+  background: linear-gradient(180deg, #FFFFFF 12%, #FFE3BE 100%);
+  -webkit-background-clip: text;
+          background-clip: text;
+}
 .hero__title-line--accent {
-  color: var(--red);
-  text-shadow: 3px 3px 0 var(--yellow-soft);
-  transform: rotate(-2deg);
+  color: var(--amber);
+  text-shadow: 0 0 42px rgba(255, 182, 39, .45), 4px 4px 0 rgba(240, 86, 43, .65);
+  transform: rotate(-2.5deg);
 }
 
 .hero__tagline {
-  font-size: clamp(1rem, 4vw, 1.25rem);
-  color: var(--ink-soft);
-  max-width: 34ch;
-  margin: 0 auto 1.75rem;
+  font-size: clamp(1.02rem, 4vw, 1.3rem);
+  color: var(--on-dark-soft);
+  max-width: 36ch;
+  margin: 0 auto 2rem;
+  text-wrap: balance;
 }
 
+/* --- the three key facts --- */
 .hero__facts {
   display: grid;
   gap: .6rem;
-  margin: 0 0 1.75rem;
+  margin: 0 0 1.9rem;
   text-align: left;
 }
 .hero__fact {
-  background: rgba(255, 255, 255, .82);
-  border: 1px solid var(--line);
+  position: relative;
+  background: rgba(255, 255, 255, .07);
+  border: 1px solid rgba(255, 246, 233, .16);
   border-radius: var(--radius);
-  padding: .8rem 1rem;
-  box-shadow: var(--shadow-sm);
+  padding: .85rem 1.05rem;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: transform .25s cubic-bezier(.2,.8,.3,1), border-color .25s ease, background-color .25s ease;
+}
+.hero__fact:hover {
+  transform: translateY(-3px);
+  border-color: rgba(255, 182, 39, .55);
+  background: rgba(255, 255, 255, .11);
 }
 .hero__fact dt {
-  font-size: .72rem;
+  font-size: .68rem;
   font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: .12em;
-  color: var(--ink-soft);
-  margin-bottom: .15rem;
+  letter-spacing: .14em;
+  color: var(--amber-lite);
+  margin-bottom: .2rem;
 }
 .hero__fact dd {
   margin: 0;
-  font-size: 1.06rem;
-  font-weight: 800;
-  color: var(--ink);
+  font-size: 1.08rem;
+  font-weight: 700;
+  color: var(--on-dark);
+  line-height: 1.25;
+}
+.hero__fact-year {
+  display: block;
+  font-size: .84rem;
+  font-weight: 500;
+  color: var(--on-dark-soft);
+  margin-top: .12rem;
 }
 
-/* Countdown */
-.countdown {
-  background: var(--navy);
-  color: #fff;
-  border-radius: var(--radius-lg);
-  padding: 1.1rem 1rem 1.25rem;
-  margin-bottom: 1.75rem;
-  box-shadow: var(--shadow);
+.hero__cta { display: grid; gap: .7rem; }
+
+/* Small "we're in the driveway" note, only shown while the sale is on */
+.hero__open-note {
+  margin: 1.25rem auto 0;
+  max-width: 36ch;
+  background: rgba(110, 231, 165, .12);
+  border: 2px dashed rgba(110, 231, 165, .6);
+  border-radius: var(--radius);
+  padding: .75rem 1rem;
+  font-size: .98rem;
+  font-weight: 600;
+  color: #C9F7DC;
 }
-.countdown__label {
-  margin: 0 0 .7rem;
-  font-size: .74rem;
-  font-weight: 800;
+
+/* While the sale is open, the Get Directions buttons breathe gently.
+   Only the shadow moves, so hovering still lifts the button normally. */
+.sale-open #directions-hero,
+.sale-open #directions-map { animation: cta-glow 2.9s ease-in-out infinite; }
+.sale-open #directions-final { animation: cta-glow-invert 2.9s ease-in-out infinite; }
+
+/* Scroll hint under the hero */
+.scroll-cue {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .4rem;
+  margin-top: 2.25rem;
+  color: rgba(255, 246, 233, .72);
+  font-size: .72rem;
+  font-weight: 700;
   letter-spacing: .16em;
   text-transform: uppercase;
-  color: var(--yellow);
+  text-decoration: none;
+  padding: .4rem .6rem;
+  transition: color .2s ease;
+}
+.scroll-cue:hover { color: var(--amber); }
+.scroll-cue__arrow {
+  width: 10px; height: 10px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg);
+  animation: nudge 1.9s ease-in-out infinite;
+}
+
+/* Confetti canvas. Fixed and click-through, so it can never add a
+   scrollbar or sit in front of a button. */
+.confetti {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 150;
+}
+
+.hero__wave { position: relative; line-height: 0; }
+.hero__wave svg { display: block; width: 100%; height: 48px; }
+.hero__wave path { fill: var(--cream); }
+
+/* ---------- 6. COUNTDOWN ---------- */
+.countdown {
+  position: relative;
+  background: rgba(255, 255, 255, .07);
+  border: 1px solid rgba(255, 246, 233, .18);
+  backdrop-filter: blur(16px) saturate(130%);
+  -webkit-backdrop-filter: blur(16px) saturate(130%);
+  color: var(--on-dark);
+  border-radius: var(--radius-xl);
+  padding: 1.35rem 1rem 1.5rem;
+  margin: 0 0 1.9rem;
+  box-shadow: 0 26px 60px -30px rgba(0, 0, 0, .85), inset 0 1px 0 rgba(255, 255, 255, .16);
+  transition: background-color .5s ease, border-color .5s ease;
+}
+.countdown__label {
+  margin: 0 0 .85rem;
+  font-size: .72rem;
+  font-weight: 800;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--amber-lite);
 }
 .countdown__grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: .4rem;
+  gap: .45rem;
 }
-/* Overnight the sale is only hours away, so the days box is dropped and
-   those hours are counted in the hours box instead. */
+/* If the sale ever runs over more than one day, the overnight countdown is
+   only hours away — the days box is dropped and those hours are counted in
+   the hours box instead. */
 .countdown__grid--hms { grid-template-columns: repeat(3, 1fr); }
 .countdown__grid--hms .countdown__unit--days { display: none; }
+
 .countdown__unit {
-  background: rgba(255, 255, 255, .1);
-  border-radius: 14px;
-  padding: .55rem .2rem .45rem;
+  position: relative;
+  background: rgba(255, 255, 255, .07);
+  border: 1px solid rgba(255, 246, 233, .12);
+  border-radius: 16px;
+  padding: .65rem .2rem .5rem;
+  overflow: hidden;
+}
+/* A highlight along the top edge, so each box reads as a raised tile */
+.countdown__unit::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 22%; right: 22%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .55), transparent);
 }
 .countdown__num {
-  display: block;
+  display: flex;
+  justify-content: center;
   font-family: var(--font-display);
-  font-size: clamp(1.5rem, 8vw, 2.5rem);
-  line-height: 1;
+  font-weight: 900;
+  font-size: clamp(1.6rem, 8.5vw, 2.7rem);
+  line-height: 1.1;
+  letter-spacing: -.02em;
   font-variant-numeric: tabular-nums;
+  color: #fff;
 }
 .countdown__word {
   display: block;
-  font-size: .62rem;
+  font-size: .6rem;
   font-weight: 700;
-  letter-spacing: .1em;
+  letter-spacing: .12em;
   text-transform: uppercase;
-  color: #E7DCCB;
-  margin-top: .3rem;
+  color: var(--on-dark-soft);
+  margin-top: .35rem;
 }
+
+/* --- the rolling digits ---
+   Each digit is a two-cell strip inside a window one line tall. To change a
+   digit the strip slides up by exactly one cell; when it lands, both cells
+   are set to the new value and the strip snaps back invisibly. */
+.digit {
+  display: inline-block;
+  height: 1.1em;
+  overflow: hidden;
+  vertical-align: bottom;
+}
+.digit__track { display: block; transform: translateY(0); }
+.digit__track.is-rolling { animation: digit-roll .42s cubic-bezier(.3,.85,.35,1) both; }
+.digit__cell { display: block; height: 1.1em; line-height: 1.1; }
+
 .countdown__status {
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(1.35rem, 6.5vw, 2rem);
+  font-weight: 900;
+  font-size: clamp(1.4rem, 6.6vw, 2.1rem);
   line-height: 1.15;
-  color: var(--yellow);
+  letter-spacing: -.02em;
+  color: var(--amber);
 }
 .countdown__sub {
-  margin: .5rem 0 0;
+  margin: .55rem auto 0;
+  max-width: 34ch;
   font-size: .98rem;
-  font-weight: 700;
-  color: #F3E9D8;
+  font-weight: 600;
+  color: var(--on-dark-soft);
 }
-.countdown--live { background: var(--green); }
-.countdown--live .countdown__label { color: #EAFBEF; }
-.countdown--live .countdown__status { color: #fff; }
-.countdown--live .countdown__sub { color: #E7F8ED; }
-.countdown--over { background: var(--teal); }
-.countdown--over .countdown__label { color: #E4F6F6; }
-.countdown--over .countdown__status { color: #fff; }
-.countdown--over .countdown__sub { color: #E4F6F6; }
 
-/* Overnight, between two days of the sale. Keeps the navy "waiting" card,
-   with the headline on top and the countdown to tomorrow underneath. */
-.countdown--next .countdown__sub {
-  max-width: 38ch;
-  margin-inline: auto;
-  color: #F6EBD6;
+/* Open */
+.countdown--live {
+  background: linear-gradient(150deg, rgba(47, 125, 79, .55), rgba(14, 124, 123, .4));
+  border-color: rgba(110, 231, 165, .45);
 }
-.countdown__label--next { margin: 1rem 0 .7rem; }
+.countdown--live .countdown__label  { color: #C9F7DC; }
+.countdown--live .countdown__status { color: #fff; }
+.countdown--live .countdown__sub    { color: #DDF7E7; }
+
+/* Finished */
+.countdown--over {
+  background: rgba(255, 255, 255, .05);
+  border-color: rgba(255, 246, 233, .14);
+}
+.countdown--over .countdown__label  { color: #A8B4B9; }
+.countdown--over .countdown__status { color: var(--on-dark); }
+.countdown--over .countdown__sub    { color: var(--on-dark-soft); }
+
+/* Overnight, between two days of a multi-day sale */
+.countdown__label--next { margin: 1.1rem 0 .8rem; }
 
 /* The moment the clock hits zero: one short pop, then the door opens. */
 .countdown--zero { animation: cd-pop .65s ease both; }
-.countdown--zero .countdown__num { color: var(--yellow); }
+.countdown--zero .countdown__num { color: var(--amber); }
 
-/* ---------- 5b. THE LITTLE GARAGE ----------
+/* ---------- 6b. THE LITTLE GARAGE ----------
    A gable roof, a wall with the door set into it, and a strip of driveway.
    All of it is plain CSS boxes — no image to download. */
 .garage {
   width: min(252px, 76%);
-  margin: 0 auto 1rem;
+  margin: 0 auto 1.15rem;
+  filter: drop-shadow(0 18px 26px rgba(0, 0, 0, .45));
 }
 .garage__roof {
   width: 112%;
@@ -537,6 +963,7 @@ ul { margin: 0; padding: 0; list-style: none; }
 .garage__sign {
   margin: 0;
   font-family: var(--font-display);
+  font-weight: 900;
   font-size: clamp(.8rem, 4.2vw, 1.05rem);
   line-height: 1.1;
   color: var(--red-deep);
@@ -592,105 +1019,78 @@ ul { margin: 0; padding: 0; list-style: none; }
 }
 .garage.is-open .garage__door { transform: translateY(-100%); }
 
-.hero__cta {
-  display: grid;
-  gap: .7rem;
-}
-
-/* Small "we're in the driveway" note, only shown while the sale is on */
-.hero__open-note {
-  margin: 1.1rem auto 0;
-  max-width: 34ch;
-  background: rgba(47, 125, 79, .1);
-  border: 2px dashed var(--green);
-  border-radius: var(--radius);
-  padding: .7rem 1rem;
-  font-size: .98rem;
-  font-weight: 700;
-  color: #1D5B36;
-}
-
-/* While the sale is open, the Get Directions buttons breathe gently.
-   Only the shadow moves, so hovering still lifts the button normally. */
-.sale-open #directions-hero,
-.sale-open #directions-map { animation: cta-glow 2.9s ease-in-out infinite; }
-.sale-open #directions-final { animation: cta-glow-invert 2.9s ease-in-out infinite; }
-
-/* Confetti canvas. Fixed and click-through, so it can never add a
-   scrollbar or sit in front of a button. */
-.confetti {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 150;
-}
-
-.hero__wave { line-height: 0; }
-.hero__wave svg {
-  display: block;
-  width: 100%;
-  height: 48px;
-}
-.hero__wave path { fill: var(--cream); }
-
-/* ---------- 6. DETAIL CARDS ---------- */
+/* ---------- 7. DETAIL CARDS ---------- */
 .cards {
   display: grid;
   gap: 1rem;
   grid-template-columns: 1fr;
 }
 .card {
+  position: relative;
   background: var(--paper);
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
-  padding: 1.4rem 1.25rem;
+  padding: 1.5rem 1.3rem;
   box-shadow: var(--shadow-sm);
-  transition: transform .2s ease, box-shadow .2s ease;
+  overflow: hidden;
+  transition: transform .28s cubic-bezier(.2,.8,.3,1), box-shadow .28s ease, border-color .28s ease;
 }
-.card:hover { transform: translateY(-4px); box-shadow: var(--shadow); }
+/* A warm glow that fades in behind the card on hover */
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(160deg, rgba(255, 182, 39, .16), rgba(240, 86, 43, .06) 55%, transparent);
+  opacity: 0;
+  transition: opacity .28s ease;
+  pointer-events: none;
+}
+.card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-lg);
+  border-color: rgba(255, 182, 39, .8);
+}
+.card:hover::before { opacity: 1; }
+.card > * { position: relative; }
+
 .card__icon {
   display: inline-grid;
   place-items: center;
-  width: 52px; height: 52px;
-  border-radius: 16px;
-  background: var(--yellow-soft);
-  font-size: 1.6rem;
-  margin-bottom: .8rem;
+  width: 54px; height: 54px;
+  border-radius: 18px;
+  background: linear-gradient(150deg, var(--amber-soft), #FFD9A0);
+  font-size: 1.65rem;
+  margin-bottom: .9rem;
+  transition: transform .32s cubic-bezier(.2,.8,.3,1);
 }
+.card:hover .card__icon { transform: rotate(-8deg) scale(1.08); }
 .card__title {
-  font-size: .78rem;
+  font-size: .74rem;
   font-weight: 800;
-  letter-spacing: .13em;
+  letter-spacing: .16em;
   text-transform: uppercase;
-  color: var(--ink-soft);
-  margin-bottom: .4rem;
+  color: var(--red-deep);
+  margin-bottom: .5rem;
 }
-.card__body { font-size: 1.2rem; margin-bottom: .35rem; }
+.card__body { font-size: 1.18rem; line-height: 1.3; margin-bottom: .4rem; }
 .card__note { font-size: .92rem; color: var(--ink-soft); margin: 0; }
-.card__note a {
-  display: inline-block;
-  padding: .3rem 0;
-  font-weight: 700;
-}
+.card__note a { display: inline-block; padding: .3rem 0; font-weight: 700; }
 
 .details__welcome {
-  margin: 1.75rem 0 0;
-  background: var(--yellow-soft);
-  border: 2px dashed var(--yellow);
-  border-radius: var(--radius);
-  padding: 1.1rem 1.25rem;
+  margin: 2rem 0 0;
+  background: linear-gradient(150deg, var(--amber-soft), #FFF3D6);
+  border: 2px dashed var(--amber);
+  border-radius: var(--radius-lg);
+  padding: 1.2rem 1.35rem;
   font-size: 1.02rem;
   text-align: center;
 }
 
-/* ---------- 7. MAP ---------- */
+/* ---------- 8. MAP ---------- */
 .map-card {
   background: var(--paper);
   border: 1px solid var(--line);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
   overflow: hidden;
   box-shadow: var(--shadow);
 }
@@ -708,202 +1108,371 @@ ul { margin: 0; padding: 0; list-style: none; }
   border: 0;
   display: block;
 }
-.map-card__body { padding: 1.25rem; }
+.map-card__body { padding: 1.4rem; }
+.map-card__kicker {
+  font-size: .7rem;
+  font-weight: 800;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--red-deep);
+  margin: 0 0 .55rem;
+}
 
 .address {
   display: flex;
   gap: .6rem;
   align-items: flex-start;
   font-style: normal;
-  font-size: 1.08rem;
+  font-size: 1.06rem;
   line-height: 1.45;
-  margin-bottom: 1.1rem;
+  margin-bottom: 1.25rem;
 }
-.address__icon { font-size: 1.3rem; }
-.address strong { font-size: 1.15rem; }
+.address__icon { font-size: 1.35rem; }
+.address strong { font-size: 1.2rem; }
 
-.map-card__actions {
-  display: grid;
-  gap: .6rem;
-}
+.map-card__actions { display: grid; gap: .6rem; }
 .map-card__note {
-  margin: 1.1rem 0 0;
-  font-size: .84rem;
+  margin: 1.25rem 0 .4rem;
+  font-size: .95rem;
   color: var(--ink-soft);
 }
-
-.locator {
-  margin: 1.5rem 0 0;
-  text-align: center;
+.map-card__credit {
+  margin: 0;
+  font-size: .8rem;
+  color: var(--ink-soft);
+  opacity: .85;
 }
+.map-card__credit a { display: inline-block; padding: .2rem 0; }
+
+.locator { margin: 1.75rem 0 0; text-align: center; }
 .locator img {
   width: 100%;
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
   border: 1px solid var(--line);
   box-shadow: var(--shadow-sm);
   background: var(--paper);
 }
 .locator figcaption {
-  margin-top: .7rem;
+  margin-top: .8rem;
   font-size: .92rem;
   color: var(--ink-soft);
 }
 
-/* ---------- 8. WHAT YOU'LL FIND ---------- */
-.pitch {
-  margin: 0 0 1.5rem;
-  padding: 1.4rem 1.35rem;
-  background: var(--paper);
-  border-left: 6px solid var(--red);
-  border-radius: 0 var(--radius) var(--radius) 0;
-  box-shadow: var(--shadow-sm);
-}
-.pitch p {
-  margin: 0;
-  font-size: clamp(1.08rem, 4.3vw, 1.35rem);
-  font-weight: 600;
-  line-height: 1.45;
-}
-
-.chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: .6rem;
-  margin-bottom: 1.75rem;
-}
-.chip {
-  display: inline-flex;
-  align-items: center;
-  gap: .45rem;
-  background: var(--yellow-soft);
-  border: 1px solid var(--yellow);
-  border-radius: 999px;
-  padding: .5rem .95rem;
-  font-weight: 700;
-  font-size: .95rem;
-}
-
-.notes {
+/* ---------- 9. WHAT YOU'LL FIND ---------- */
+.finds {
   display: grid;
-  gap: .7rem;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+  margin-bottom: 2rem;
 }
+.find {
+  position: relative;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem 1.35rem;
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  transition: transform .28s cubic-bezier(.2,.8,.3,1), box-shadow .28s ease, border-color .28s ease;
+}
+/* A price-tag corner, so the cards read as things on a table */
+.find::after {
+  content: "";
+  position: absolute;
+  top: -26px; right: -26px;
+  width: 68px; height: 68px;
+  border-radius: 50%;
+  background: linear-gradient(150deg, rgba(255, 182, 39, .38), rgba(240, 86, 43, .18));
+  transition: transform .35s cubic-bezier(.2,.8,.3,1);
+}
+.find:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-lg);
+  border-color: rgba(240, 86, 43, .55);
+}
+.find:hover::after { transform: scale(1.35); }
+.find > * { position: relative; }
+.find__icon {
+  display: inline-grid;
+  place-items: center;
+  width: 58px; height: 58px;
+  border-radius: 20px;
+  background: linear-gradient(150deg, #FFF0CF, #FFE0B0);
+  font-size: 1.8rem;
+  margin-bottom: .85rem;
+  transition: transform .32s cubic-bezier(.2,.8,.3,1);
+}
+.find:hover .find__icon { transform: translateY(-3px) rotate(6deg); }
+.find__title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.3rem;
+  letter-spacing: -.01em;
+  margin-bottom: .35rem;
+}
+.find__body { margin: 0; color: var(--ink-soft); font-size: .98rem; }
+
+/* --- the surprise machine --- */
+.surprise {
+  position: relative;
+  text-align: center;
+  background: linear-gradient(155deg, var(--night-3), var(--night));
+  color: var(--on-dark);
+  border-radius: var(--radius-xl);
+  padding: 2rem 1.35rem 2.1rem;
+  margin-bottom: 2rem;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+.surprise::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(70% 90% at 15% 0%, rgba(255, 182, 39, .28), transparent 60%),
+    radial-gradient(70% 90% at 88% 100%, rgba(240, 86, 43, .26), transparent 60%);
+  pointer-events: none;
+}
+.surprise > * { position: relative; }
+.surprise__title {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(1.4rem, 5.6vw, 2rem);
+  letter-spacing: -.02em;
+  margin-bottom: .35rem;
+}
+.surprise__lead {
+  color: var(--on-dark-soft);
+  font-size: .98rem;
+  max-width: 40ch;
+  margin: 0 auto 1.35rem;
+}
+.surprise__out {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 4.5rem;
+  margin: 0 auto 1.35rem;
+  max-width: 30ch;
+  padding: .9rem 1.1rem;
+  border-radius: var(--radius);
+  border: 1px dashed rgba(255, 246, 233, .28);
+  background: rgba(255, 255, 255, .06);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(1.05rem, 4.4vw, 1.3rem);
+  line-height: 1.3;
+}
+.surprise__placeholder { color: var(--on-dark-soft); font-weight: 500; font-size: .95rem; }
+.surprise__out.is-new { animation: prize-in .5s cubic-bezier(.2,.9,.3,1.2) both; }
+
+.notes { display: grid; gap: .7rem; }
 .notes li {
   display: flex;
-  gap: .7rem;
+  gap: .75rem;
   align-items: flex-start;
   line-height: 1.45;
   background: var(--paper);
   border: 1px solid var(--line);
   border-radius: var(--radius);
-  padding: .85rem 1rem;
+  padding: .9rem 1.05rem;
   font-size: .98rem;
   box-shadow: var(--shadow-sm);
+  transition: transform .2s ease, border-color .2s ease;
 }
-.notes__icon { flex: 0 0 auto; font-size: 1.15rem; }
+.notes li:hover { transform: translateX(3px); border-color: rgba(255, 182, 39, .8); }
+.notes__icon { flex: 0 0 auto; font-size: 1.2rem; }
 
-/* ---------- 9. FINAL CTA + FOOTER ---------- */
+/* ---------- 10. FINAL CTA + FOOTER ---------- */
 .final-cta {
-  background: var(--navy);
-  color: #fff;
+  position: relative;
+  isolation: isolate;
+  background: var(--night);
+  color: var(--on-dark);
   text-align: center;
-  padding: clamp(2.5rem, 8vw, 4rem) 0;
+  padding: clamp(3rem, 9vw, 4.75rem) 0;
+  overflow: hidden;
+}
+.final-cta__glow {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(60% 120% at 20% 0%, rgba(240, 86, 43, .45), transparent 62%),
+    radial-gradient(55% 120% at 85% 100%, rgba(255, 182, 39, .32), transparent 62%);
 }
 .final-cta h2 {
   font-family: var(--font-display);
-  font-size: clamp(1.9rem, 8vw, 3rem);
+  font-weight: 900;
+  font-size: clamp(2rem, 8.5vw, 3.2rem);
+  letter-spacing: -.03em;
   margin-bottom: .3em;
 }
 .final-cta__when {
-  color: var(--yellow);
-  font-weight: 700;
-  margin-bottom: 1.5rem;
+  color: var(--amber-lite);
+  font-weight: 600;
+  margin-bottom: 1.75rem;
+  text-wrap: balance;
 }
 
 .site-footer {
-  background: #16110C;
-  color: #D9CDBC;
+  background: var(--night-2);
+  color: var(--on-dark-soft);
   text-align: center;
-  padding: 2rem 0;
-  font-size: .9rem;
+  padding: 2.5rem 0 2rem;
+  font-size: .95rem;
 }
-.site-footer__title { font-weight: 800; color: #fff; margin-bottom: .25rem; }
-.site-footer__meta { margin-bottom: .9rem; }
+.site-footer__brand {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 1.3rem;
+  letter-spacing: -.01em;
+  color: var(--on-dark);
+  margin-bottom: 1.5rem;
+}
+.site-footer__cols {
+  display: grid;
+  gap: 1.25rem;
+  justify-content: center;
+  margin-bottom: 1.75rem;
+}
+.site-footer__col { margin: 0; line-height: 1.55; }
+.site-footer__label {
+  display: block;
+  font-size: .68rem;
+  font-weight: 800;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--amber);
+  margin-bottom: .3rem;
+}
+.site-footer__sign {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.15rem;
+  color: var(--on-dark);
+  margin-bottom: 1.1rem;
+}
 .site-footer__back { margin: 0; }
-.site-footer__back a {
-  display: inline-block;
-  padding: .5rem .9rem;
-  font-weight: 700;
-}
-.map-card__note a { display: inline-block; padding: .2rem 0; }
-.site-footer a { color: var(--yellow); }
+.site-footer__back a { display: inline-block; padding: .5rem .9rem; font-weight: 700; }
+.site-footer a { color: var(--amber); }
 .site-footer a:hover { color: #fff; }
 
-/* ---------- 10. ANIMATIONS ---------- */
+/* ---------- 11. KEYFRAMES + SCROLL REVEAL ---------- */
+@keyframes drift-a {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50%      { transform: translate3d(6%, 5%, 0) scale(1.08); }
+}
+@keyframes drift-b {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50%      { transform: translate3d(-7%, 7%, 0) scale(1.1); }
+}
+@keyframes drift-c {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50%      { transform: translate3d(5%, -6%, 0) scale(1.06); }
+}
+@keyframes bob {
+  0%, 100% { transform: translate(-50%, -50%) translate(var(--px, 0px), var(--py, 0px)) translateY(0)     rotate(-4deg); }
+  50%      { transform: translate(-50%, -50%) translate(var(--px, 0px), var(--py, 0px)) translateY(-14px) rotate(4deg); }
+}
 @keyframes flag-sway {
   0%, 100% { transform: rotate(-2.5deg); }
   50%      { transform: rotate(2.5deg); }
 }
 @keyframes pulse {
-  0%, 100% { opacity: 1;  transform: scale(1); }
-  50%      { opacity: .45; transform: scale(.82); }
+  0%, 100% { opacity: 1;   transform: scale(1); }
+  50%      { opacity: .45; transform: scale(.8); }
+}
+@keyframes ping {
+  0%   { opacity: .7; transform: scale(1); }
+  100% { opacity: 0;  transform: scale(3.2); }
+}
+@keyframes nudge {
+  0%, 100% { transform: rotate(45deg) translate(0, 0); }
+  50%      { transform: rotate(45deg) translate(3px, 3px); }
+}
+@keyframes digit-roll {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-50%); }
+}
+@keyframes menu-in {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes prize-in {
+  0%   { opacity: 0; transform: translateY(10px) scale(.94); }
+  60%  { opacity: 1; transform: translateY(0)    scale(1.03); }
+  100% { opacity: 1; transform: none; }
 }
 /* The countdown's one-off "we hit zero" pop */
 @keyframes cd-pop {
-  0%   { transform: scale(1);     box-shadow: var(--shadow); }
-  45%  { transform: scale(1.045); box-shadow: 0 0 0 7px rgba(255, 193, 69, .3), var(--shadow); }
-  100% { transform: scale(1);     box-shadow: var(--shadow); }
+  0%   { transform: scale(1); }
+  45%  { transform: scale(1.04); box-shadow: 0 0 0 8px rgba(255, 182, 39, .22), 0 26px 60px -30px rgba(0, 0, 0, .85); }
+  100% { transform: scale(1); }
 }
 /* Gentle "come now" glow on the Get Directions buttons during the sale */
 @keyframes cta-glow {
-  0%, 100% { box-shadow: var(--shadow); }
-  50%      { box-shadow: 0 0 0 9px rgba(228, 87, 46, .17), var(--shadow); }
+  0%, 100% { box-shadow: 0 10px 22px -12px rgba(163, 49, 18, .9); }
+  50%      { box-shadow: 0 0 0 9px rgba(240, 86, 43, .2), 0 10px 22px -12px rgba(163, 49, 18, .9); }
 }
 @keyframes cta-glow-invert {
-  0%, 100% { box-shadow: var(--shadow); }
-  50%      { box-shadow: 0 0 0 9px rgba(255, 193, 69, .26), var(--shadow); }
+  0%, 100% { box-shadow: 0 12px 26px -14px rgba(255, 182, 39, .95); }
+  50%      { box-shadow: 0 0 0 9px rgba(255, 182, 39, .3), 0 12px 26px -14px rgba(255, 182, 39, .95); }
 }
 
 /* Fade-in-on-scroll. Only hidden when JavaScript is running (the `.js` class),
-   so the content is never invisible if a script fails to load. */
+   so the content is never invisible if a script fails to load.
+   `--i` on a card staggers it behind the one before it. */
 .js .reveal {
   opacity: 0;
-  transform: translateY(18px);
-  transition: opacity .55s ease, transform .55s ease;
+  transform: translateY(22px) scale(.985);
+  transition: opacity .6s cubic-bezier(.2,.8,.3,1), transform .6s cubic-bezier(.2,.8,.3,1);
+  transition-delay: calc(var(--i, 0) * 90ms);
 }
 .js .reveal.is-visible { opacity: 1; transform: none; }
 
-/* Respect "reduce motion" — turn all the movement off */
-@media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-  *, *::before, *::after {
-    animation-duration: .001ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: .001ms !important;
-  }
-  .reveal { opacity: 1; transform: none; }
-  .btn:hover, .card:hover { transform: none; }
-  /* The garage still shows the right state, it just doesn't slide, and the
-     "come now" glow and the confetti are switched off entirely. */
-  .garage__door { transition: none; }
-  .sale-open #directions-hero,
-  .sale-open #directions-map,
-  .sale-open #directions-final { animation: none; }
-}
+/* ---------- 12. BIGGER SCREENS ---------- */
 
-/* ---------- 11. BIGGER SCREENS ---------- */
-
-/* Very small phones (320–419px): make room so all four nav links fit
-   on screen instead of needing to be scrolled sideways. */
-@media (max-width: 419px) {
+/* Very small phones (320–379px) */
+@media (max-width: 379px) {
   .nav__brand-text { display: none; }
   .nav__brand-icon { font-size: 1.4rem; }
-  .nav__links a { font-size: .78rem; padding: .5rem .38rem; }
-  .hero__eyebrow { font-size: .68rem; letter-spacing: .04em; padding: .4rem .7rem; }
+  .status { font-size: .66rem; letter-spacing: .1em; padding: .4rem .8rem; }
+  .countdown { padding-inline: .7rem; }
+  .countdown__grid { gap: .3rem; }
+  .countdown__word { font-size: .53rem; letter-spacing: .06em; }
 }
 
-/* Small phones and up (~380px): put the two hero buttons side by side */
-@media (min-width: 380px) {
-  .hero__cta { grid-template-columns: 1fr 1fr; }
+/* Phones: the three facts become one compact "ticket" so the countdown and
+   the buttons sit higher up the screen. */
+@media (max-width: 559px) {
+  .hero__facts {
+    gap: 0;
+    background: rgba(255, 255, 255, .07);
+    border: 1px solid rgba(255, 246, 233, .16);
+    border-radius: var(--radius);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    overflow: hidden;
+  }
+  .hero__fact {
+    display: flex;
+    align-items: baseline;
+    gap: .7rem;
+    padding: .65rem .9rem;
+    background: none;
+    border: 0;
+    border-radius: 0;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+  .hero__fact + .hero__fact { border-top: 1px dashed rgba(255, 246, 233, .2); }
+  .hero__fact:hover { transform: none; background: none; }
+  .hero__fact dt { flex: 0 0 5.4rem; margin: 0; letter-spacing: .1em; white-space: nowrap; }
+  .hero__fact dd { font-size: 1rem; }
+  .hero__fact-year { font-size: .8rem; }
+  /* Fewer floating objects — on a narrow screen they crowd the text */
+  .floater:nth-child(n+5) { display: none; }
 }
 
 /* Large phones / small tablets */
@@ -911,58 +1480,109 @@ ul { margin: 0; padding: 0; list-style: none; }
   :root { --header-h: 66px; }
   .hero__facts { grid-template-columns: repeat(2, 1fr); }
   .hero__fact:last-child { grid-column: 1 / -1; }
-  .hero__cta { justify-content: center; grid-template-columns: repeat(2, minmax(0, 265px)); margin-inline: auto; }
+  /* From here up there is room for the two hero buttons side by side */
+  .hero__cta { justify-content: center; grid-template-columns: repeat(2, minmax(0, 260px)); margin-inline: auto; }
   .cards { grid-template-columns: repeat(2, 1fr); }
+  .finds { grid-template-columns: repeat(2, 1fr); }
   .map-card__actions { grid-template-columns: repeat(2, 1fr); }
-  .countdown__grid { gap: .6rem; }
-  .countdown { padding: 1.35rem 1.25rem 1.5rem; }
+  .countdown { padding: 1.6rem 1.35rem 1.75rem; }
+  .countdown__grid { gap: .65rem; }
+  .site-footer__cols { grid-template-columns: repeat(2, minmax(0, 220px)); gap: 2rem; }
 }
 
-/* Tablets */
-@media (min-width: 768px) {
+/* Tablets — the real navigation appears and the hamburger goes away */
+@media (min-width: 820px) {
   body { font-size: 18px; }
-  .nav__links a { font-size: .92rem; padding: .5rem .8rem; }
-  .nav__brand { font-size: 1.15rem; }
-  .hero { padding-top: 2.75rem; }
-  .hero__inner { padding-bottom: 4.5rem; }
-  .hero__facts { grid-template-columns: repeat(3, 1fr); }
+  .nav__links { display: flex; }
+  .nav__cta { width: auto; height: auto; min-height: 42px; padding: .5rem 1rem; border-radius: 999px; }
+  .nav__cta-text { display: inline; }
+  .nav__toggle { display: none; }
+  .site-header.is-open .nav__links {
+    position: static;
+    display: flex;
+    padding: 0;
+    background: none;
+    box-shadow: none;
+    border: 0;
+    animation: none;
+  }
+  .site-header.is-open .nav__links a { padding: .5rem .7rem; font-size: .92rem; font-weight: 600; }
+  .site-header.is-open .nav__links a::after { display: block; }
+
+  .hero { padding-top: calc(var(--header-h) + 1.75rem); }
+  .hero__inner { padding-bottom: 3.25rem; }
+  .hero__facts { grid-template-columns: repeat(3, 1fr); max-width: 720px; margin-inline: auto; margin-bottom: 2.25rem; }
   .hero__fact:last-child { grid-column: auto; }
-  .hero__fact { padding: 1rem 1.15rem; text-align: center; }
-  .countdown { max-width: 620px; margin-inline: auto; margin-bottom: 2rem; }
+  .hero__fact { padding: 1.05rem 1.2rem; text-align: center; }
+  .countdown { max-width: 720px; margin-inline: auto; margin-bottom: 2.25rem; }
   .garage { width: 292px; }
   .garage__roof { height: 30px; }
   .map-frame { aspect-ratio: 16 / 9; }
-  .map-card__body { padding: 1.75rem; }
-  .hero__wave svg { height: 64px; }
+  .map-card__body { padding: 1.9rem; }
+  .hero__wave svg { height: 66px; }
   .bunting span { max-width: 44px; height: 32px; }
+  .finds { grid-template-columns: repeat(3, 1fr); }
+  .surprise { padding: 2.6rem 2rem 2.75rem; }
+  .notes { grid-template-columns: repeat(2, 1fr); }
 }
 
 /* Laptops and desktops */
 @media (min-width: 1024px) {
   .cards { grid-template-columns: repeat(4, 1fr); }
-  .hero__title { font-size: clamp(5rem, 9vw, 8rem); }
+  .hero__title { font-size: clamp(5.5rem, 9.5vw, 9rem); }
   .map-card { display: grid; grid-template-columns: 1.35fr 1fr; }
-  .map-frame { height: 100%; aspect-ratio: auto; min-height: 420px; }
+  .map-frame { height: 100%; aspect-ratio: auto; min-height: 440px; }
   .map-card__body { display: flex; flex-direction: column; justify-content: center; }
   /* The side column is narrow — keep each button label on one line */
-  .map-card__actions .btn { font-size: .95rem; padding-inline: .85rem; }
+  .map-card__actions .btn { font-size: .95rem; padding-inline: .9rem; }
   .section__lead { font-size: 1.1rem; }
 }
 
-/* ---------- 12. PRINT ---------- */
+/* ---------- 13. REDUCED MOTION ----------
+   Everything that moves is switched off, and the information it carried is
+   still shown — the garage is simply already open, and the digits change
+   instantly instead of rolling. */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .js .reveal { opacity: 1; transform: none; }
+  .btn:hover, .card:hover, .find:hover, .hero__fact:hover, .notes li:hover { transform: none; }
+  .btn::after { display: none; }
+  .garage__door { transition: none; }
+  .floater { animation: none; }
+  .sale-open #directions-hero,
+  .sale-open #directions-map,
+  .sale-open #directions-final { animation: none; }
+}
+
+/* ---------- 14. PRINT ---------- */
 @media print {
-  .site-header, .hero__cta, .final-cta .btn,
+  .site-header, .hero__cta, .final-cta .btn, .scroll-cue,
   .map-frame, .bunting, .hero__wave, .toast, .skip-link,
-  .garage, .confetti { display: none !important; }
+  .garage, .confetti, .hero__bg, .floaters, .surprise,
+  /* A live "starting soon / live / ended" badge means nothing on paper */
+  .status { display: none !important; }
   body { background: #fff; color: #000; font-size: 12pt; }
-  .section, .hero { padding: .5rem 0; }
+  .hero, .final-cta, .site-footer, .surprise { background: #fff !important; color: #000 !important; }
+  .hero { margin-top: 0; padding-top: .5rem; }
+  .hero__title-line:first-child { color: #000; -webkit-text-fill-color: #000; }
+  .hero__title-line--accent { color: #000; text-shadow: none; }
+  .hero__tagline, .hero__fact dd, .countdown__sub, .final-cta__when,
+  .site-footer, .site-footer__brand, .site-footer__sign { color: #000 !important; }
+  .hero__fact, .countdown { border: 1px solid #999 !important; background: #fff !important; color: #000 !important; }
+  .countdown__label, .countdown__status, .countdown__num { color: #000 !important; }
+  .countdown__word, .hero__fact dt, .section__kicker, .map-card__kicker,
+  .card__title { color: #333 !important; }
+  .section, .hero { padding-block: .5rem; }
   /* Show everything instantly. Without killing the transition, the fade-in
      sections are still part-way through fading when the page is captured
      for printing, and come out pale. */
-  *, *::before, *::after {
-    transition: none !important;
-    animation: none !important;
-  }
+  *, *::before, *::after { transition: none !important; animation: none !important; }
   .reveal { opacity: 1 !important; transform: none !important; }
   /* Tap-only controls are useless on paper — the address is printed as text */
   .map-card__actions { display: none !important; }

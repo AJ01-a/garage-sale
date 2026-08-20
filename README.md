@@ -2,7 +2,7 @@
 
 A small, fast, mobile-friendly website announcing a garage sale:
 
-> **Saturday & Sunday, August 15 & 16, 2026 · 8:00 AM – 4:00 PM both days**
+> **Saturday, August 22, 2026 · 8:00 AM – 4:00 PM · one day only**
 > 55 Bradley Boulevard, Neepawa, Manitoba
 
 It is a plain **HTML + CSS + JavaScript** website — no frameworks, no build step, no server.
@@ -18,7 +18,7 @@ It also comes with ready-to-post **advertisement images** for Facebook, Messenge
 Garage-Sale/
 ├── index.html                  ← the whole website (all the text lives here)
 ├── styles.css                  ← the colours, fonts and layout
-├── script.js                   ← countdown, opening celebration, map links, copy button
+├── script.js                   ← countdown, opening celebration, map links, menu, copy button
 ├── site.webmanifest            ← name + icons when saved to a phone home screen
 ├── .nojekyll                   ← tells GitHub Pages to serve the files as-is
 ├── README.md                   ← this file
@@ -72,38 +72,38 @@ phone/tablet icon (or press `Ctrl + Shift + M`). You can then pick "iPhone SE",
 
 ### Seeing what the page looks like on sale day
 
-The sale runs over two days, so the page moves through five states by itself:
-counting down, open on Saturday, shut for the night, open again on Sunday, and
-finished. To look at any of them right now, add one of these to the end of the address:
+The page moves through three states by itself: counting down, open, and
+finished. To look at any of them right now, add one of these to the end of
+the address:
 
 | Add this to the address | What you'll see |
 | --- | --- |
 | `?preview=before` | Two days to go — the normal countdown |
-| `?preview=open` | Five seconds before Saturday opens, so you can watch the whole thing: the numbers hit zero, the garage door rolls up, confetti falls, and the card turns into **🎉 GARAGE SALE IS OPEN! 🎉** |
-| `?preview=live` | Arriving in the middle of Saturday |
-| `?preview=closing` | Ten seconds before Saturday's 4:00 PM finish |
-| `?preview=tonight` | Overnight — **🎉 BACK TOMORROW! 🎉** and the countdown to Sunday morning |
-| `?preview=sunday` | Five seconds before Sunday opens — the door rolls up again with a smaller burst of confetti |
-| `?preview=live2` | Arriving in the middle of Sunday |
-| `?preview=ending` | Ten seconds before the sale finishes for good |
-| `?preview=ended` | After the whole sale — **👋 Thanks for stopping by!** |
-| `?at=2026-08-16T07:59:55-05:00` | Pretend it is any exact moment you like |
+| `?preview=open` | Five seconds before it opens, so you can watch the whole thing: the numbers hit zero, the garage door rolls up, confetti falls, and the card turns into **🎉 THE SALE IS ON! 🎉** |
+| `?preview=live` | Arriving in the middle of the sale |
+| `?preview=closing` | Ten seconds before the 4:00 PM finish |
+| `?preview=ended` | After the sale — **👋 The sale has ended** |
+| `?at=2026-08-22T07:59:55-05:00` | Pretend it is any exact moment you like |
 
 For example: **http://localhost:8000/?preview=open**
 
-This is only for you. A plain visit to the website — with nothing after the address —
-always uses the real clock, so nobody sees these unless they type one in on purpose.
-If you'd rather it didn't exist at all, delete the `previewOffset` function in
-`script.js` and the one line that calls it (search for `previewOffset`).
+The little pill at the top of the page follows along too: **Starting soon**
+before, **Sale is live** during, **Sale ended** afterwards.
 
-The opening celebration plays **once per visit, per day of the sale**. If someone
-refreshes the page during the sale they just see "GARAGE SALE IS OPEN!" without the
-animation replaying. To watch it again while testing, open a new tab (or close and
-reopen the browser). Sunday morning gets a gentler version — the door still rolls up,
-with a shorter burst of confetti, since it's a continuation rather than the big opening.
+This is only for you. A plain visit to the website — with nothing after the
+address — always uses the real clock, so nobody sees these unless they type one
+in on purpose. If you'd rather it didn't exist at all, delete the
+`previewOffset` function in `script.js` and the one line that calls it (search
+for `previewOffset`).
 
-Anyone whose phone or computer is set to "reduce motion" gets the same information with
-the door already open, no confetti and no movement.
+The opening celebration plays **once per visit**. If someone refreshes the page
+during the sale they just see "THE SALE IS ON!" without the animation replaying.
+To watch it again while testing, open a new tab (or close and reopen the
+browser).
+
+Anyone whose phone or computer is set to "reduce motion" gets the same
+information with the door already open, no confetti and no movement — the
+numbers change instantly instead of rolling.
 
 ---
 
@@ -224,10 +224,12 @@ between the tags. You don't need to understand the tags — just change the word
 | Date, time, address at the top | `index.html` → search for `hero__facts` |
 | The four information cards | `index.html` → search for `<ul class="cards">` |
 | "What You'll Find" paragraph | `index.html` → search for `class="pitch"` |
-| The item categories (the coloured pills) | `index.html` → search for `id="category-list"` |
+| The three "What You'll Find" cards | `index.html` → search for `id="category-list"` |
+| The fun "Reveal a surprise" lines | `script.js` → the `surprises` list at the top |
+| The wording in the little status pill | `script.js` → `badgeBefore`, `badgeLive`, `badgeOver` |
 | The helpful notes (cash, bags) | `index.html` → search for `<ul class="notes">` |
 | **The countdown dates/times** | `script.js` → the `days` list at the very top |
-| The wording on sale day ("GARAGE SALE IS OPEN!", "Thanks for stopping by!") | `script.js` → `messageLive`, `subLive`, `messageOver`, `subOver` |
+| The wording on sale day ("THE SALE IS ON!", "The sale has ended") | `script.js` → `messageLive`, `subLive`, `messageOver`, `subOver` |
 | The "look for us in the driveway" note | `index.html` → search for `open-note` |
 | The address used by the map buttons | `script.js` → `address`, `latitude`, `longitude` |
 | Google/Facebook preview text | `index.html` → the `<meta ...>` lines near the top |
@@ -237,36 +239,39 @@ between the tags. You don't need to understand the tags — just change the word
 Find this in `index.html`:
 
 ```html
-<ul class="chips" id="category-list">
-  <li class="chip"><span aria-hidden="true">🏡</span> Household items</li>
+<ul class="finds" id="category-list">
+  <li class="find reveal" style="--i:0">
+    <span class="find__icon" aria-hidden="true">🏡</span>
+    <h3 class="find__title">Household</h3>
+    <p class="find__body">Kitchen bits, homeware and the useful things every house collects.</p>
+  </li>
 ```
 
-Copy one `<li>` line, paste it underneath, and change the emoji and the words:
-
-```html
-  <li class="chip"><span aria-hidden="true">📚</span> Books &amp; games</li>
-```
+Copy one whole `<li>...</li>` block, paste it underneath, and change the emoji
+and the words. Bump the `--i:0` number by one each time — that is only the
+order the cards fade in as you scroll.
 
 ### Changing the dates
 
 If you move the sale, change **three** things:
 
-1. The visible text in `index.html` (a few spots — use Find for `August 15`).
+1. The visible text in `index.html` (a few spots — use Find for `August 22`).
 2. The days in `script.js`. There is one line per day of the sale:
    ```js
    days: [
-     { startISO: '2026-08-15T08:00:00-05:00', endISO: '2026-08-15T16:00:00-05:00' },  // Saturday
-     { startISO: '2026-08-16T08:00:00-05:00', endISO: '2026-08-16T16:00:00-05:00' }   // Sunday
+     { startISO: '2026-08-22T08:00:00-05:00', endISO: '2026-08-22T16:00:00-05:00' }   // Saturday
    ],
    ```
    Keep the `-05:00` on the end — that's Manitoba summer time, and it makes the countdown
    correct for visitors in every time zone. (In winter, Manitoba is `-06:00`.)
-3. `subNext` in `script.js` — the overnight message is the one sentence with a date
-   written into it.
+3. The `<script type="application/ld+json">` block near the top of `index.html`
+   — that is the copy Google reads. Change `startDate` and `endDate` to match.
 
-**Adding or removing a day** is just adding or removing a line in `days`. Everything
-else follows: the countdown, the overnight "back tomorrow" message, which morning gets
-the big celebration, and when the sale is finally over.
+**Adding a second day** is just adding a line to `days`. Everything else follows
+by itself: the countdown, an overnight "back tomorrow" message, which morning
+gets the big celebration, and when the sale is finally over. If you do, change
+`subNext` in `script.js` too — it is the one message with wording about
+tomorrow in it.
 
 ---
 
@@ -328,8 +333,13 @@ computer, then attach it to your post and paste the website link in the text.
   the correct "open" or "ended" message.
 * The confetti is about 40 lines of plain JavaScript drawing on one `<canvas>`, which
   deletes itself after four seconds. No library, nothing left running afterwards.
-* No frameworks and no web fonts — the whole page is well under 100 KB of code, plus a
-  lazy-loaded map that only loads when you scroll to it.
+* No frameworks and no JavaScript libraries — the whole page is well under 100 KB of
+  code, plus a lazy-loaded map that only loads when you scroll to it.
+* One web font (Outfit) is loaded without blocking the page. If it is slow or the
+  visitor is offline, the system font is used instead and nothing waits.
+* The background washes, the floating objects, the film grain and the scroll
+  fade-ins are all plain CSS. The confetti is the only canvas on the page, and it
+  deletes itself when it finishes.
 * The map is OpenStreetMap's official embed, which is free to use and correctly credited.
 
 ---
@@ -344,4 +354,5 @@ computer, then attach it to your post and paste the website link in the text.
 | Facebook preview shows the wrong thing | Do section **E**, then paste your link into <https://developers.facebook.com/tools/debug/> and click *Scrape Again*. |
 | Countdown says the wrong thing | Check the `days` list in `script.js`. |
 | The garage door / confetti didn't play again | That's on purpose — it plays once per visit. Open a new tab to see it again, or use `?preview=open` (section **A**). |
+| The menu button does nothing | The full navigation replaces it on screens 820 px and wider — the button only appears on phones and small tablets. |
 | QR code goes to the wrong page | Re-run `python3 tools/set-site-url.py <your link>`. |

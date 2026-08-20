@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1200" viewBox="0 0 1200 1200" role="img" aria-labelledby="ad-title ad-desc">
-  <title id="ad-title">Garage Sale — Saturday and Sunday, August 15 and 16, 8 AM to 4 PM, 55 Bradley Boulevard, Neepawa MB</title>
+  <title id="ad-title">Garage Sale — Saturday, August 22, 8 AM to 4 PM, 55 Bradley Boulevard, Neepawa MB</title>
   <desc id="ad-desc">Colourful garage sale advertisement with flag bunting, the date and time, and the street address.</desc>
 
   <defs>
@@ -53,8 +53,8 @@
     <path d="M108 590 L1092 590 L1092 712 L108 712 Z" fill="#17363F"/>
     <path d="M108 590 L60 651 L108 712 Z" fill="#122A31"/>
     <path d="M1092 590 L1140 651 L1092 712 Z" fill="#122A31"/>
-    <text class="disp" x="600" y="643" text-anchor="middle" font-size="50" fill="#FFFFFF" letter-spacing="1">SATURDAY &amp; SUNDAY</text>
-    <text class="disp" x="600" y="697" text-anchor="middle" font-size="50" fill="#FFC145" letter-spacing="1">AUGUST 15 &amp; 16</text>
+    <text class="disp" x="600" y="643" text-anchor="middle" font-size="50" fill="#FFFFFF" letter-spacing="1">SATURDAY</text>
+    <text class="disp" x="600" y="697" text-anchor="middle" font-size="50" fill="#FFC145" letter-spacing="1">AUGUST 22, 2026</text>
   </g>
 
   <!-- Time -->

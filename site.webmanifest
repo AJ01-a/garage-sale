@@ -1,12 +1,12 @@
 {
   "name": "Garage Sale — 55 Bradley Boulevard, Neepawa MB",
   "short_name": "Garage Sale",
-  "description": "Garage sale on Saturday and Sunday, August 15 and 16, 2026, 8:00 AM to 4:00 PM both days, at 55 Bradley Boulevard, Neepawa, Manitoba.",
+  "description": "Garage sale on Saturday, August 22, 2026, 8:00 AM to 4:00 PM, at 55 Bradley Boulevard, Neepawa, Manitoba. One day only.",
   "start_url": "./",
   "scope": "./",
   "display": "browser",
-  "background_color": "#FFF7EC",
-  "theme_color": "#E4572E",
+  "background_color": "#FFF8EF",
+  "theme_color": "#101E26",
   "icons": [
     { "src": "assets/favicon.svg", "sizes": "any", "type": "image/svg+xml" },
     { "src": "assets/favicon-32.png", "sizes": "32x32", "type": "image/png" },

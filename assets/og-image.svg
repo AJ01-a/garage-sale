@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="og-title">
-  <title id="og-title">Garage Sale — Saturday and Sunday, August 15 and 16, 8 AM to 4 PM, 55 Bradley Boulevard, Neepawa MB</title>
+  <title id="og-title">Garage Sale — Saturday, August 22, 8 AM to 4 PM, 55 Bradley Boulevard, Neepawa MB</title>
 
   <defs>
     <linearGradient id="ogbg" x1="0" y1="0" x2="0" y2="1">
@@ -47,7 +47,7 @@
   <!-- Date + time banner -->
   <g>
     <rect x="150" y="404" width="900" height="80" rx="14" fill="#17363F"/>
-    <text class="disp" x="600" y="457" text-anchor="middle" font-size="36" fill="#FFFFFF">SAT &amp; SUN, AUG 15 &amp; 16  ·  8 AM – 4 PM</text>
+    <text class="disp" x="600" y="457" text-anchor="middle" font-size="36" fill="#FFFFFF">SATURDAY, AUGUST 22  ·  8 AM – 4 PM</text>
   </g>
 
   <!-- Address -->

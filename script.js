@@ -17,8 +17,7 @@ const SITE_CONFIG = {
   // Because the offset is included, the countdown is correct for a visitor
   // in ANY time zone in the world.
   days: [
-    { startISO: '2026-08-15T08:00:00-05:00', endISO: '2026-08-15T16:00:00-05:00' },  // Saturday
-    { startISO: '2026-08-16T08:00:00-05:00', endISO: '2026-08-16T16:00:00-05:00' }   // Sunday
+    { startISO: '2026-08-22T08:00:00-05:00', endISO: '2026-08-22T16:00:00-05:00' }   // Saturday
   ],
 
   // --- WHERE --------------------------------------------------------------
@@ -34,23 +33,44 @@ const SITE_CONFIG = {
 
   // --- MESSAGES -----------------------------------------------------------
   // If you change the dates above, change the wording in `subNext` too —
-  // that's the only message with a date written into it.
+  // that's the only message with a date written into it. (It is only used
+  // if the sale runs over more than one day.)
   labelBefore:  'Sale starts in',
   labelLive:    'Happening right now',
   labelNext:    'Tomorrow’s sale starts in',
   labelOver:    'That’s a wrap',
 
-  messageLive:  '🎉 GARAGE SALE IS OPEN! 🎉',        // first day
-  subLive:      'Come on by and take a look!',
+  messageLive:  '🎉 THE SALE IS ON! 🎉',            // first day
+  subLive:      'Today · 8:00 AM – 4:00 PM. Come on by and take a look!',
 
-  messageAgain: '🛍️ GARAGE SALE IS OPEN! 🛍️',       // any day after the first
+  messageAgain: '🛍️ THE SALE IS ON! 🛍️',           // any day after the first
   subAgain:     'We’re open again — come on by and take a look!',
 
   messageNext:  '🎉 BACK TOMORROW! 🎉',              // overnight, between days
-  subNext:      'We’re continuing the garage sale tomorrow — Sunday, August 16, 8:00 AM to 4:00 PM.',
+  subNext:      'We’re continuing the garage sale tomorrow, 8:00 AM to 4:00 PM.',
 
-  messageOver:  '👋 Thanks for stopping by!',        // after the very last day
-  subOver:      'The garage sale has ended.'
+  messageOver:  '👋 The sale has ended',             // after the very last day
+  subOver:      'Thanks so much to everyone who stopped by!',
+
+  // The little pill at the top of the page
+  badgeBefore:  'Starting soon',
+  badgeNext:    'Back tomorrow',
+  badgeLive:    'Sale is live',
+  badgeOver:    'Sale ended',
+
+  // The fun "reveal a surprise" button. Add or change as many as you like.
+  surprises: [
+    'Something you didn’t know you needed 👀',
+    'A hidden gem 💎',
+    'Something nostalgic 📼',
+    'A genuinely great deal 💰',
+    'A mystery item 🎁',
+    'Something for the workshop 🔧',
+    'A completely unexpected find 🤔',
+    'The perfect thing for that empty shelf 🪴',
+    'A book you’ll actually read 📚',
+    'Something you’ll argue about with a friend 😄'
+  ]
 };
 
 /* ========================================================================= */
@@ -62,6 +82,13 @@ const SITE_CONFIG = {
 
   const $  = (sel) => document.querySelector(sel);
   const $$ = (sel) => Array.prototype.slice.call(document.querySelectorAll(sel));
+
+  const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+  let prefersReducedMotion = motionQuery.matches;
+  // Someone can flip the setting while the page is open.
+  const onMotionChange = function (e) { prefersReducedMotion = e.matches; };
+  if (motionQuery.addEventListener) motionQuery.addEventListener('change', onMotionChange);
+  else if (motionQuery.addListener) motionQuery.addListener(onMotionChange);
 
   /* ---------------------------------------------------------------------
      1. MAP + DIRECTIONS LINKS
@@ -76,7 +103,7 @@ const SITE_CONFIG = {
     const satellite  = 'https://www.google.com/maps/@' + lat + ',' + lon + ',18z/data=!3m1!1e3';
     const apple      = 'https://maps.apple.com/?q=' + q + '&ll=' + lat + ',' + lon;
 
-    $$('#directions-hero, #directions-map, #directions-final').forEach(function (a) {
+    $$('#directions-hero, #directions-map, #directions-final, #directions-nav').forEach(function (a) {
       a.href = directions;
     });
     if ($('#link-satellite')) $('#link-satellite').href = satellite;
@@ -86,17 +113,86 @@ const SITE_CONFIG = {
     if (copyBtn) copyBtn.dataset.copy = SITE_CONFIG.address;
   }
 
-  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  /* ---------------------------------------------------------------------
+     2. ROLLING DIGITS
+     Each digit is a two-cell strip inside a window one line tall. To change
+     it, the strip slides up by exactly one cell; when it lands, both cells
+     are set to the new value and the strip snaps back invisibly, ready for
+     the next change. Only digits that actually changed ever move.
+     --------------------------------------------------------------------- */
+  const ROLL_MS = 420;
+
+  function makeDigit(ch) {
+    const digit = document.createElement('span');
+    digit.className = 'digit';
+    const track = document.createElement('span');
+    track.className = 'digit__track';
+    const now  = document.createElement('span');
+    const next = document.createElement('span');
+    now.className = next.className = 'digit__cell';
+    now.textContent = next.textContent = ch;
+    track.appendChild(now);
+    track.appendChild(next);
+    digit.appendChild(track);
+    digit._track = track;
+    digit._now = now;
+    digit._next = next;
+    digit._value = ch;
+    return digit;
+  }
+
+  function setDigit(digit, ch) {
+    if (digit._value === ch) return;
+    digit._value = ch;
+
+    if (prefersReducedMotion) {
+      digit._now.textContent = digit._next.textContent = ch;
+      return;
+    }
+
+    digit._next.textContent = ch;
+    digit._track.classList.remove('is-rolling');
+    void digit._track.offsetWidth;          // restart the animation
+    digit._track.classList.add('is-rolling');
+
+    clearTimeout(digit._timer);
+    digit._timer = setTimeout(function () {
+      digit._now.textContent = digit._next.textContent = digit._value;
+      digit._track.classList.remove('is-rolling');
+    }, ROLL_MS + 20);
+  }
+
+  /* Draws `text` into `el`, reusing the digit strips already there. */
+  function setNumber(el, text) {
+    if (!el) return;
+    if (el._text === text) return;
+    let digits = el._digits;
+
+    if (!digits || digits.length !== text.length) {
+      el.textContent = '';
+      digits = el._digits = [];
+      for (let i = 0; i < text.length; i++) {
+        const d = makeDigit(text.charAt(i));
+        digits.push(d);
+        el.appendChild(d);
+      }
+    } else {
+      for (let i = 0; i < text.length; i++) setDigit(digits[i], text.charAt(i));
+    }
+    el._text = text;
+  }
 
   /* ---------------------------------------------------------------------
-     2. COUNTDOWN + OPENING CELEBRATION
-     The sale runs over more than one day, so there are five states:
+     3. COUNTDOWN + OPENING CELEBRATION
+     There are three states for a one-day sale:
 
-       before   counting down to the first morning
-       live     open — first day
-       next     shut for the night, counting down to tomorrow morning
-       again    open — any day after the first
-       over     finished for good, after the last day
+       before   counting down to the morning
+       live     open
+       over     finished
+
+     (Two extra states, `next` and `again`, take care of a sale that runs
+     over more than one day — add a second line to `days` and they switch
+     themselves on.)
 
      TIME ZONES: every startISO / endISO carries Manitoba's UTC offset, so
      they are exact points in time. Comparing them against Date.now()
@@ -113,6 +209,8 @@ const SITE_CONFIG = {
     const sr     = $('#countdown-sr');
     const garage = $('#garage');
     const note   = $('#open-note');
+    const badge  = $('#status-badge');
+    const badgeText = $('#status-text');
     if (!box || !grid || !label || !status || !sub || !next) return;
 
     const days = (SITE_CONFIG.days || []).map(function (day) {
@@ -121,10 +219,12 @@ const SITE_CONFIG = {
 
     // If the dates are missing or typed wrong, fail quietly instead of
     // showing "NaN".
-    const broken = !days.length || days.some(function (d) { return isNaN(d.start) || isNaN(d.end); });
+    const broken = !days.length || days.some(function (d) {
+      return isNaN(d.start) || isNaN(d.end) || d.end <= d.start;
+    });
     if (broken) {
       grid.hidden = true;
-      label.textContent = 'August 15 & 16, 2026';
+      label.textContent = 'Saturday, August 22, 2026 · 8:00 AM – 4:00 PM';
       return;
     }
 
@@ -156,6 +256,14 @@ const SITE_CONFIG = {
     const isOpen    = (name) => name === 'live' || name === 'again';
     const isWaiting = (name) => name === 'before' || name === 'next';
 
+    function setBadge(name) {
+      if (!badge || !badgeText) return;
+      if (isOpen(name))        { badge.dataset.state = 'live';   badgeText.textContent = SITE_CONFIG.badgeLive; }
+      else if (name === 'over'){ badge.dataset.state = 'over';   badgeText.textContent = SITE_CONFIG.badgeOver; }
+      else if (name === 'next'){ badge.dataset.state = 'before'; badgeText.textContent = SITE_CONFIG.badgeNext; }
+      else                     { badge.dataset.state = 'before'; badgeText.textContent = SITE_CONFIG.badgeBefore; }
+    }
+
     // Paints one state. Safe to call at any time — it always clears the
     // others first, so states can never stack up.
     function applyState(s) {
@@ -173,6 +281,7 @@ const SITE_CONFIG = {
       if (note)   note.hidden = !open;
       if (garage) garage.classList.toggle('is-open', open);
       document.body.classList.toggle('sale-open', open);
+      setBadge(s.name);
 
       if (s.name === 'before') {
         label.textContent = SITE_CONFIG.labelBefore;
@@ -199,7 +308,7 @@ const SITE_CONFIG = {
       label.textContent  = SITE_CONFIG.labelOver;
       status.textContent = SITE_CONFIG.messageOver;
       sub.textContent    = SITE_CONFIG.subOver;
-      if (sr) sr.textContent = 'Thanks for stopping by. ' + SITE_CONFIG.subOver;
+      if (sr) sr.textContent = 'The garage sale has ended. ' + SITE_CONFIG.subOver;
     }
 
     /* The opening celebration, at most once per day per browser tab.
@@ -222,10 +331,10 @@ const SITE_CONFIG = {
         return;
       }
 
-      els.days.textContent  = '0';
-      els.hours.textContent = '00';
-      els.mins.textContent  = '00';
-      els.secs.textContent  = '00';
+      setNumber(els.days,  '0');
+      setNumber(els.hours, '00');
+      setNumber(els.mins,  '00');
+      setNumber(els.secs,  '00');
       box.classList.add('countdown--zero');
 
       setTimeout(function () {
@@ -255,20 +364,20 @@ const SITE_CONFIG = {
       if (s.name === 'over') return false;  // finished — stop the timer
       if (isOpen(s.name)) return true;      // keep ticking so it closes on time
 
-      // Counting down to days[s.index]. During the overnight wait the days
+      // Counting down to days[s.index]. During an overnight wait the days
       // box is hidden, so those hours are rolled into the hours box.
       const hideDays = s.name === 'next';
-      let remaining  = Math.floor((days[s.index].start - now) / 1000);
+      let remaining  = Math.max(0, Math.floor((days[s.index].start - now) / 1000));
       const dayCount = hideDays ? 0 : Math.floor(remaining / 86400);
       remaining -= dayCount * 86400;
       const hours    = Math.floor(remaining / 3600);  remaining -= hours * 3600;
       const mins     = Math.floor(remaining / 60);
       const secs     = remaining - mins * 60;
 
-      els.days.textContent  = String(dayCount);
-      els.hours.textContent = pad(hours);
-      els.mins.textContent  = pad(mins);
-      els.secs.textContent  = pad(secs);
+      setNumber(els.days,  String(dayCount));
+      setNumber(els.hours, pad(hours));
+      setNumber(els.mins,  pad(mins));
+      setNumber(els.secs,  pad(secs));
 
       // Announce to screen readers once a minute, not 60 times a minute.
       if (sr && mins !== lastSrMinute) {
@@ -304,7 +413,7 @@ const SITE_CONFIG = {
   }
 
   /* ---------------------------------------------------------------------
-     2b. CONFETTI
+     3b. CONFETTI
      One <canvas>, a few dozen paper rectangles, then it deletes itself.
      No library, nothing left running afterwards.
      --------------------------------------------------------------------- */
@@ -333,7 +442,7 @@ const SITE_CONFIG = {
     window.addEventListener('resize', resize);
 
     // The site's own palette, so it looks like it belongs here.
-    const colours = ['#E4572E', '#FFC145', '#126E73', '#2F7D4F', '#FFE29A', '#FFFFFF'];
+    const colours = ['#F0562B', '#FFB627', '#0E7C7B', '#2F7D4F', '#FFE9B8', '#FFFFFF'];
     const full    = w < 480 ? 70 : 120;
     const count   = small ? Math.round(full * 0.45) : full;    // gentler on day two
     const bits    = [];
@@ -392,21 +501,20 @@ const SITE_CONFIG = {
   }
 
   /* ---------------------------------------------------------------------
-     2c. PREVIEW MODE — FOR TESTING ONLY
+     3c. PREVIEW MODE — FOR TESTING ONLY
      Off unless you deliberately put ?preview=... on the end of the address,
      so the live website is never affected. Delete this function (and the
      one line that calls it) if you'd rather it not exist at all.
 
        ?preview=before    two days to go
        ?preview=open      five seconds to go — watch the whole celebration
-       ?preview=live      mid-sale on the first day
-       ?preview=closing   ten seconds before the first day shuts
-       ?preview=tonight   overnight: "back tomorrow" + the countdown
-       ?preview=sunday    five seconds before the second day opens
-       ?preview=live2     mid-sale on the second day
-       ?preview=ending    ten seconds before the last day shuts
-       ?preview=ended     after the whole sale
-       ?at=2026-08-15T07:59:55-05:00   pretend it is this exact moment
+       ?preview=live      mid-sale
+       ?preview=closing   ten seconds before the 4:00 PM finish
+       ?preview=ended     after the sale
+       ?at=2026-08-22T07:59:55-05:00   pretend it is this exact moment
+
+     If the sale is ever given a second day, three more turn up by
+     themselves: ?preview=tonight, ?preview=nextday and ?preview=live2.
      --------------------------------------------------------------------- */
   function previewOffset(days) {
     let params;
@@ -426,19 +534,21 @@ const SITE_CONFIG = {
       open:    first.start - 5000,
       live:    first.start + 2 * 3600000,
       closing: first.end - 10000,
-      tonight: first.end + 3 * 3600000,
-      sunday:  last.start - 5000,
-      live2:   last.start + 2 * 3600000,
       ending:  last.end - 10000,
       ended:   last.end + 3600000
     };
+    if (days.length > 1) {
+      moments.tonight = first.end + 3 * 3600000;   // overnight, between days
+      moments.nextday = last.start - 5000;         // just before the next morning
+      moments.live2   = last.start + 2 * 3600000;  // mid-sale on the last day
+    }
     const pick = params.get('preview');
     if (pick && moments[pick] != null) return moments[pick] - Date.now();
     return 0;
   }
 
   /* ---------------------------------------------------------------------
-     3. "COPY ADDRESS" BUTTON
+     4. "COPY ADDRESS" BUTTON
      --------------------------------------------------------------------- */
   function toast(message) {
     const el = $('#toast');
@@ -488,13 +598,146 @@ const SITE_CONFIG = {
   }
 
   /* ---------------------------------------------------------------------
-     4. FADE-IN ON SCROLL + ACTIVE NAV LINK
+     5. NAVIGATION — hamburger menu, sticky bar, reading progress
+     --------------------------------------------------------------------- */
+  function initNav() {
+    const header = $('#site-header');
+    const toggle = $('#nav-toggle');
+    const links  = $('#nav-links');
+    if (!header || !toggle || !links) return;
+
+    const desktop = window.matchMedia('(min-width: 820px)');
+
+    function setOpen(open) {
+      header.classList.toggle('is-open', open);
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    }
+    const isOpen = function () { return header.classList.contains('is-open'); };
+
+    toggle.addEventListener('click', function () { setOpen(!isOpen()); });
+
+    // Tapping a link jumps to the section, so the menu should get out of the way.
+    links.addEventListener('click', function (e) {
+      if (e.target.closest('a')) setOpen(false);
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && isOpen()) { setOpen(false); toggle.focus(); }
+    });
+
+    document.addEventListener('click', function (e) {
+      if (isOpen() && !header.contains(e.target)) setOpen(false);
+    });
+
+    // Growing the window past the phone breakpoint shows the full navigation,
+    // so the "open" state has to be dropped or the toggle stays out of sync.
+    const onBreakpoint = function (e) { if (e.matches) setOpen(false); };
+    if (desktop.addEventListener) desktop.addEventListener('change', onBreakpoint);
+    else if (desktop.addListener) desktop.addListener(onBreakpoint);
+  }
+
+  function initScrollChrome() {
+    const header = $('#site-header');
+    const bar    = $('#progress-bar');
+    const hero   = document.querySelector('.hero');
+    if (!header && !bar) return;
+
+    let ticking = false;
+
+    function update() {
+      ticking = false;
+      const y = window.pageYOffset || document.documentElement.scrollTop || 0;
+
+      if (header) {
+        // Swap to the solid bar just as the dark hero scrolls out from
+        // under it, so the text never sits on a background it can't be
+        // read against.
+        const limit = hero ? Math.max(80, hero.offsetHeight - header.offsetHeight - 24) : 80;
+        header.classList.toggle('is-stuck', y > limit);
+      }
+
+      if (bar) {
+        const doc = document.documentElement;
+        const total = (doc.scrollHeight - window.innerHeight) || 1;
+        bar.style.width = Math.min(100, Math.max(0, (y / total) * 100)) + '%';
+      }
+    }
+
+    function onScroll() {
+      if (!ticking) { ticking = true; requestAnimationFrame(update); }
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+    update();
+  }
+
+  /* ---------------------------------------------------------------------
+     6. HERO PARALLAX
+     The floating objects lean a little towards the pointer. Skipped
+     entirely on touch screens and for anyone who asked for less motion.
+     --------------------------------------------------------------------- */
+  function initParallax() {
+    const wrap = $('#floaters');
+    if (!wrap || prefersReducedMotion) return;
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+
+    const items = $$('.floater');
+    if (!items.length) return;
+
+    let targetX = 0, targetY = 0, ticking = false;
+
+    function apply() {
+      ticking = false;
+      items.forEach(function (el) {
+        const depth = parseFloat(el.dataset.depth || '12');
+        el.style.setProperty('--px', (targetX * depth).toFixed(1) + 'px');
+        el.style.setProperty('--py', (targetY * depth).toFixed(1) + 'px');
+      });
+    }
+
+    document.querySelector('.hero').addEventListener('pointermove', function (e) {
+      targetX = (e.clientX / window.innerWidth  - 0.5) * 2;
+      targetY = (e.clientY / window.innerHeight - 0.5) * 2;
+      if (!ticking) { ticking = true; requestAnimationFrame(apply); }
+    }, { passive: true });
+  }
+
+  /* ---------------------------------------------------------------------
+     7. THE SURPRISE MACHINE
+     Picks a random line, never the same one twice in a row.
+     --------------------------------------------------------------------- */
+  function initSurprise() {
+    const btn = $('#surprise-btn');
+    const out = $('#surprise-out');
+    if (!btn || !out) return;
+
+    const lines = SITE_CONFIG.surprises || [];
+    if (!lines.length) { btn.hidden = true; return; }
+    let last = -1;
+
+    btn.addEventListener('click', function () {
+      let i = Math.floor(Math.random() * lines.length);
+      if (lines.length > 1 && i === last) i = (i + 1) % lines.length;
+      last = i;
+
+      out.textContent = lines[i];
+      out.classList.remove('is-new');
+      void out.offsetWidth;                 // restart the animation
+      out.classList.add('is-new');
+      btn.textContent = '';
+      btn.insertAdjacentHTML('beforeend',
+        '<span aria-hidden="true">🎲</span> Try another');
+    });
+  }
+
+  /* ---------------------------------------------------------------------
+     8. FADE-IN ON SCROLL + ACTIVE NAV LINK
      --------------------------------------------------------------------- */
   function initReveal() {
     const items = $$('.reveal');
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    if (reduce || !('IntersectionObserver' in window)) {
+    if (prefersReducedMotion || !('IntersectionObserver' in window)) {
       items.forEach(function (el) { el.classList.add('is-visible'); });
       return;
     }
@@ -536,12 +779,16 @@ const SITE_CONFIG = {
   }
 
   /* ---------------------------------------------------------------------
-     5. START EVERYTHING
+     9. START EVERYTHING
      --------------------------------------------------------------------- */
   function init() {
     buildMapLinks();
     initCountdown();
     initCopyAddress();
+    initNav();
+    initScrollChrome();
+    initParallax();
+    initSurprise();
     initReveal();
     initActiveNav();
   }
