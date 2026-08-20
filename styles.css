@@ -14,7 +14,7 @@
      6. Countdown + the little garage
      7. Detail cards
      8. Map / Find Us
-     9. What You'll Find + the surprise machine
+     9. Ticker, live bar, celebration + party button
     10. Final CTA + footer
     11. Keyframes + scroll reveal
     12. Bigger screens (media queries)
@@ -57,6 +57,7 @@
   --font-display: "Outfit", system-ui, -apple-system, "Segoe UI Variable Display", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 
   /* Shape + depth */
+  --livebar-h:  0px;   /* set by script.js while the sale is open */
   --radius:     18px;
   --radius-lg:  26px;
   --radius-xl:  32px;
@@ -80,7 +81,7 @@
 
 html {
   scroll-behavior: smooth;
-  scroll-padding-top: calc(var(--header-h) + 14px);
+  scroll-padding-top: calc(var(--header-h) + var(--livebar-h) + 14px);
   -webkit-text-size-adjust: 100%;
 }
 
@@ -149,7 +150,6 @@ ul { margin: 0; padding: 0; list-style: none; }
 .section { padding: clamp(3rem, 9vw, 5.5rem) 0; }
 .section--details { background: var(--cream); }
 .section--map     { background: var(--cream-deep); }
-.section--find    { background: var(--cream); }
 
 .section__kicker {
   display: inline-flex;
@@ -527,6 +527,24 @@ ul { margin: 0; padding: 0; list-style: none; }
     linear-gradient(180deg, rgba(16, 30, 38, 0) 42%, rgba(13, 25, 32, .78) 82%, rgba(10, 21, 27, .96) 100%);
 }
 
+/* A slow-turning fan of light behind everything else. Very low contrast —
+   you should notice the hero feels alive without spotting the rays. */
+.hero__rays {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 200vmax;
+  height: 200vmax;
+  transform: translate(-50%, -30%);
+  background: repeating-conic-gradient(from 0deg at 50% 50%,
+    rgba(255, 232, 190, .055) 0deg 5deg,
+    transparent 5deg 16deg);
+  -webkit-mask-image: radial-gradient(closest-side, #000 8%, transparent 55%);
+          mask-image: radial-gradient(closest-side, #000 8%, transparent 55%);
+  animation: rays-turn 90s linear infinite;
+  pointer-events: none;
+}
+
 /* Faint blueprint grid, fading out towards the bottom */
 .hero__grid {
   position: absolute;
@@ -653,9 +671,28 @@ ul { margin: 0; padding: 0; list-style: none; }
           background-clip: text;
 }
 .hero__title-line--accent {
+  position: relative;
+  display: block;
   color: var(--amber);
   text-shadow: 0 0 42px rgba(255, 182, 39, .45), 4px 4px 0 rgba(240, 86, 43, .65);
   transform: rotate(-2.5deg);
+  overflow: hidden;
+}
+/* A band of light that travels across the word every few seconds. It is a
+   second copy of the same text, clipped to a moving stripe, so it lights up
+   the letters themselves rather than the box around them. */
+.hero__title-line--accent::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  color: #FFF8E4;
+  text-shadow: 0 0 26px rgba(255, 255, 255, .8);
+  -webkit-mask-image: linear-gradient(100deg, transparent 42%, #000 50%, transparent 58%);
+          mask-image: linear-gradient(100deg, transparent 42%, #000 50%, transparent 58%);
+  -webkit-mask-size: 260% 100%;
+          mask-size: 260% 100%;
+  animation: title-shine 5.5s ease-in-out infinite;
+  pointer-events: none;
 }
 
 .hero__tagline {
@@ -731,6 +768,17 @@ ul { margin: 0; padding: 0; list-style: none; }
 .sale-open #directions-hero,
 .sale-open #directions-map { animation: cta-glow 2.9s ease-in-out infinite; }
 .sale-open #directions-final { animation: cta-glow-invert 2.9s ease-in-out infinite; }
+
+
+/* --- sale day: the page as a whole picks up the pace --- */
+.sale-open .bunting span { animation-duration: 2.2s; }
+.sale-open .floater { opacity: .5; animation-duration: 5.5s; }
+.sale-open .hero__title-line--accent { color: var(--green-lite); }
+.sale-open .details__welcome {
+  background: linear-gradient(150deg, #DFF7E8, #F2FFF7);
+  border-color: var(--green);
+}
+.sale-open .card__icon { background: linear-gradient(150deg, #DFF7E8, #C7F0DA); }
 
 /* Scroll hint under the hero */
 .scroll-cue {
@@ -1051,7 +1099,26 @@ ul { margin: 0; padding: 0; list-style: none; }
   border-color: rgba(255, 182, 39, .8);
 }
 .card:hover::before { opacity: 1; }
-.card > * { position: relative; }
+/* A soft spotlight that follows the pointer across the card. `--mx` / `--my`
+   are written by script.js; without JavaScript it simply never appears. */
+.card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(220px circle at var(--mx, 50%) var(--my, 50%),
+              rgba(255, 182, 39, .28), transparent 62%);
+  opacity: 0;
+  transition: opacity .3s ease;
+  pointer-events: none;
+}
+.card:hover::after { opacity: 1; }
+.card > * { position: relative; z-index: 1; }
+/* The whole card leans very slightly towards the pointer. */
+.card.is-tilting {
+  transform: translateY(-6px) perspective(900px)
+             rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
+  transition: box-shadow .28s ease, border-color .28s ease;
+}
 
 .card__icon {
   display: inline-grid;
@@ -1099,6 +1166,10 @@ ul { margin: 0; padding: 0; list-style: none; }
   width: 100%;
   aspect-ratio: 4 / 3;
   background: #E8E0D3;
+  overflow: hidden;
+  /* The map inside sizes itself from the frame the moment it loads, so the
+     frame must have a settled size before then — never let it collapse. */
+  min-height: 260px;
 }
 .map-frame iframe {
   position: absolute;
@@ -1107,7 +1178,64 @@ ul { margin: 0; padding: 0; list-style: none; }
   height: 100%;
   border: 0;
   display: block;
+  /* Belt and braces: some browsers hand an iframe its intrinsic 300x150 for
+     a frame moment, which is what leaves a small map floating in a big box. */
+  min-width: 100%;
+  min-height: 100%;
 }
+
+/* A pane over the map. It stops a swipe from dragging the map instead of
+   scrolling the page, and disappears on the first tap. */
+.map-frame__shield {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  place-content: center;
+  gap: .5rem;
+  justify-items: center;
+  border: 0;
+  padding: 1rem;
+  font: inherit;
+  color: #fff;
+  cursor: pointer;
+  background: radial-gradient(60% 60% at 50% 45%, rgba(16, 30, 38, .1), rgba(16, 30, 38, .42));
+  transition: opacity .3s ease, visibility .3s ease;
+}
+.map-frame.is-live .map-frame__shield { opacity: 0; visibility: hidden; }
+.map-frame__pin {
+  font-size: 2.4rem;
+  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, .45));
+  animation: pin-drop 2.6s ease-in-out infinite;
+}
+.map-frame__hint {
+  background: rgba(16, 30, 38, .82);
+  border-radius: 999px;
+  padding: .4rem .95rem;
+  font-size: .8rem;
+  font-weight: 800;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+.map-frame__expand {
+  position: absolute;
+  z-index: 3;
+  right: .7rem;
+  bottom: .7rem;
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  background: rgba(255, 248, 239, .95);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: .45rem .85rem;
+  font-size: .8rem;
+  font-weight: 800;
+  text-decoration: none;
+  box-shadow: var(--shadow-sm);
+}
+.map-frame__expand:hover { color: var(--red-deep); border-color: var(--red); }
 .map-card__body { padding: 1.4rem; }
 .map-card__kicker {
   font-size: .7rem;
@@ -1131,11 +1259,6 @@ ul { margin: 0; padding: 0; list-style: none; }
 .address strong { font-size: 1.2rem; }
 
 .map-card__actions { display: grid; gap: .6rem; }
-.map-card__note {
-  margin: 1.25rem 0 .4rem;
-  font-size: .95rem;
-  color: var(--ink-soft);
-}
 .map-card__credit {
   margin: 0;
   font-size: .8rem;
@@ -1158,130 +1281,219 @@ ul { margin: 0; padding: 0; list-style: none; }
   color: var(--ink-soft);
 }
 
-/* ---------- 9. WHAT YOU'LL FIND ---------- */
-.finds {
-  display: grid;
-  gap: 1rem;
-  grid-template-columns: 1fr;
-  margin-bottom: 2rem;
-}
-.find {
-  position: relative;
-  background: var(--paper);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-lg);
-  padding: 1.5rem 1.35rem;
-  box-shadow: var(--shadow-sm);
+/* ---------- 9. TICKER, LIVE BAR, CELEBRATION ---------- */
+
+/* --- the scrolling strip under the hero --- */
+.ticker {
+  background: var(--night-2);
+  color: var(--amber-lite);
+  border-block: 1px solid rgba(255, 246, 233, .12);
   overflow: hidden;
-  transition: transform .28s cubic-bezier(.2,.8,.3,1), box-shadow .28s ease, border-color .28s ease;
+  /* Fades out at both ends so the words slide in and out of nothing rather
+     than being chopped off against the edge of the screen. */
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+          mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
 }
-/* A price-tag corner, so the cards read as things on a table */
-.find::after {
-  content: "";
-  position: absolute;
-  top: -26px; right: -26px;
-  width: 68px; height: 68px;
-  border-radius: 50%;
-  background: linear-gradient(150deg, rgba(255, 182, 39, .38), rgba(240, 86, 43, .18));
-  transition: transform .35s cubic-bezier(.2,.8,.3,1);
+.ticker__track {
+  display: flex;
+  width: max-content;
+  animation: ticker-slide 26s linear infinite;
 }
-.find:hover {
-  transform: translateY(-6px);
-  box-shadow: var(--shadow-lg);
-  border-color: rgba(240, 86, 43, .55);
-}
-.find:hover::after { transform: scale(1.35); }
-.find > * { position: relative; }
-.find__icon {
-  display: inline-grid;
-  place-items: center;
-  width: 58px; height: 58px;
-  border-radius: 20px;
-  background: linear-gradient(150deg, #FFF0CF, #FFE0B0);
-  font-size: 1.8rem;
-  margin-bottom: .85rem;
-  transition: transform .32s cubic-bezier(.2,.8,.3,1);
-}
-.find:hover .find__icon { transform: translateY(-3px) rotate(6deg); }
-.find__title {
+.ticker__row {
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+  padding: .7rem 1.1rem .7rem 0;
+  white-space: nowrap;
   font-family: var(--font-display);
   font-weight: 800;
-  font-size: 1.3rem;
-  letter-spacing: -.01em;
-  margin-bottom: .35rem;
+  font-size: .82rem;
+  letter-spacing: .18em;
+  text-transform: uppercase;
 }
-.find__body { margin: 0; color: var(--ink-soft); font-size: .98rem; }
+.ticker__row b { font-weight: 800; }
+.ticker__row i { color: var(--red); font-style: normal; }
+/* On sale day it speeds up and turns green — the whole page shifts gear. */
+.sale-open .ticker { color: #C9F7DC; background: #0C2A1B; }
+.sale-open .ticker__track { animation-duration: 13s; }
+.sale-open .ticker__row i { color: var(--green-lite); }
 
-/* --- the surprise machine --- */
-.surprise {
-  position: relative;
-  text-align: center;
-  background: linear-gradient(155deg, var(--night-3), var(--night));
-  color: var(--on-dark);
-  border-radius: var(--radius-xl);
-  padding: 2rem 1.35rem 2.1rem;
-  margin-bottom: 2rem;
-  overflow: hidden;
-  box-shadow: var(--shadow);
+/* --- "we're open right now" bar, pinned above the navigation --- */
+.livebar {
+  position: sticky;
+  top: 0;
+  z-index: 110;
+  background: linear-gradient(100deg, #1C6B43, #0E7C7B 55%, #1C6B43);
+  background-size: 220% 100%;
+  animation: livebar-shift 9s ease-in-out infinite;
+  color: #EAFFF3;
+  box-shadow: 0 8px 24px -18px rgba(0, 0, 0, .9);
 }
-.surprise::before {
+.livebar__inner {
+  width: min(1140px, 100% - 1.5rem);
+  margin-inline: auto;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: .45rem .7rem;
+  padding: .5rem 0;
+  font-size: .88rem;
+}
+.livebar__dot {
+  position: relative;
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  background: var(--green-lite);
+  flex: 0 0 auto;
+}
+.livebar__dot::after {
   content: "";
   position: absolute;
   inset: 0;
-  background:
-    radial-gradient(70% 90% at 15% 0%, rgba(255, 182, 39, .28), transparent 60%),
-    radial-gradient(70% 90% at 88% 100%, rgba(240, 86, 43, .26), transparent 60%);
-  pointer-events: none;
+  border-radius: 50%;
+  background: var(--green-lite);
+  animation: ping 1.8s cubic-bezier(0,0,.2,1) infinite;
 }
-.surprise > * { position: relative; }
-.surprise__title {
+.livebar__title { font-weight: 800; letter-spacing: .01em; }
+.livebar__time { color: #B9EBD2; font-variant-numeric: tabular-nums; }
+.livebar__link {
+  margin-left: auto;
+  color: #fff;
+  font-weight: 800;
+  text-decoration: none;
+  border-bottom: 2px solid rgba(255, 255, 255, .45);
+  padding-bottom: 1px;
+}
+.livebar__link:hover { color: var(--amber-lite); border-bottom-color: var(--amber); }
+/* The navigation sits directly underneath, so it has to stick lower down.
+   JavaScript measures the bar and writes --livebar-h. */
+.sale-open .site-header { top: var(--livebar-h, 0px); }
+
+/* --- how much of the sale day is left --- */
+.dayprogress { margin: 1.25rem auto 0; max-width: 30rem; }
+.dayprogress__track {
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, .28);
+  overflow: hidden;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, .4);
+}
+.dayprogress__fill {
+  display: block;
+  height: 100%;
+  width: 0%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--green-lite), var(--amber));
+  background-size: 200% 100%;
+  animation: bar-shift 3.4s linear infinite;
+  transition: width 1s linear;
+}
+.dayprogress__label {
+  margin: .5rem 0 0;
+  font-size: .78rem;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: #D9F7E6;
+}
+
+/* --- the one-off "we're open" celebration --- */
+.opening {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: .4rem;
+  padding: 1.5rem;
+  text-align: center;
+  background: radial-gradient(120% 90% at 50% 45%, rgba(16, 30, 38, .92), rgba(10, 21, 27, .97));
+  pointer-events: none;
+  animation: opening-in .5s ease both;
+}
+.opening.is-leaving { animation: opening-out .7s ease both; }
+.opening__burst {
+  position: absolute;
+  width: min(90vw, 620px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg,
+    rgba(255, 182, 39, .5) 0deg 12deg, transparent 12deg 30deg,
+    rgba(240, 86, 43, .45) 30deg 42deg, transparent 42deg 60deg,
+    rgba(110, 231, 165, .4) 60deg 72deg, transparent 72deg 90deg,
+    rgba(255, 182, 39, .5) 90deg 102deg, transparent 102deg 120deg,
+    rgba(240, 86, 43, .45) 120deg 132deg, transparent 132deg 150deg,
+    rgba(110, 231, 165, .4) 150deg 162deg, transparent 162deg 180deg,
+    rgba(255, 182, 39, .5) 180deg 192deg, transparent 192deg 210deg,
+    rgba(240, 86, 43, .45) 210deg 222deg, transparent 222deg 240deg,
+    rgba(110, 231, 165, .4) 240deg 252deg, transparent 252deg 270deg,
+    rgba(255, 182, 39, .5) 270deg 282deg, transparent 282deg 300deg,
+    rgba(240, 86, 43, .45) 300deg 312deg, transparent 312deg 330deg,
+    rgba(110, 231, 165, .4) 330deg 342deg, transparent 342deg 360deg);
+  -webkit-mask-image: radial-gradient(closest-side, transparent 22%, #000 34%, #000 68%, transparent 82%);
+          mask-image: radial-gradient(closest-side, transparent 22%, #000 34%, #000 68%, transparent 82%);
+  animation: burst-spin 9s linear infinite;
+}
+.opening__word {
+  position: relative;
+  margin: 0;
   font-family: var(--font-display);
   font-weight: 900;
-  font-size: clamp(1.4rem, 5.6vw, 2rem);
-  letter-spacing: -.02em;
-  margin-bottom: .35rem;
+  font-size: clamp(2.8rem, 15vw, 7rem);
+  line-height: .95;
+  letter-spacing: -.03em;
+  color: var(--amber);
+  text-shadow: 0 0 48px rgba(255, 182, 39, .55), 5px 5px 0 rgba(240, 86, 43, .7);
+  animation: word-pop .8s cubic-bezier(.2,1.3,.4,1) both;
 }
-.surprise__lead {
-  color: var(--on-dark-soft);
-  font-size: .98rem;
-  max-width: 40ch;
-  margin: 0 auto 1.35rem;
-}
-.surprise__out {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 4.5rem;
-  margin: 0 auto 1.35rem;
-  max-width: 30ch;
-  padding: .9rem 1.1rem;
-  border-radius: var(--radius);
-  border: 1px dashed rgba(255, 246, 233, .28);
-  background: rgba(255, 255, 255, .06);
-  font-family: var(--font-display);
+.opening__sub {
+  position: relative;
+  margin: 0;
+  max-width: 26ch;
+  font-size: clamp(1rem, 4vw, 1.25rem);
   font-weight: 700;
-  font-size: clamp(1.05rem, 4.4vw, 1.3rem);
-  line-height: 1.3;
+  color: var(--on-dark);
+  animation: word-pop .8s .18s cubic-bezier(.2,1.3,.4,1) both;
 }
-.surprise__placeholder { color: var(--on-dark-soft); font-weight: 500; font-size: .95rem; }
-.surprise__out.is-new { animation: prize-in .5s cubic-bezier(.2,.9,.3,1.2) both; }
 
-.notes { display: grid; gap: .7rem; }
-.notes li {
-  display: flex;
-  gap: .75rem;
-  align-items: flex-start;
-  line-height: 1.45;
-  background: var(--paper);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  padding: .9rem 1.05rem;
-  font-size: .98rem;
-  box-shadow: var(--shadow-sm);
-  transition: transform .2s ease, border-color .2s ease;
+/* --- floating "throw confetti" button, sale day only --- */
+.partybtn {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 160;
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  min-height: 50px;
+  padding: .7rem 1.15rem;
+  border: 0;
+  border-radius: 999px;
+  font: inherit;
+  font-weight: 800;
+  color: #3A2A12;
+  background: linear-gradient(140deg, var(--amber-lite), var(--amber));
+  box-shadow: 0 14px 30px -14px rgba(0, 0, 0, .7);
+  cursor: pointer;
+  animation: party-bob 2.6s ease-in-out infinite;
+  transition: transform .18s cubic-bezier(.2,.8,.3,1), box-shadow .18s ease;
 }
-.notes li:hover { transform: translateX(3px); border-color: rgba(255, 182, 39, .8); }
-.notes__icon { flex: 0 0 auto; font-size: 1.2rem; }
+.partybtn:hover  { transform: translateY(-3px) scale(1.04); box-shadow: 0 20px 36px -16px rgba(0, 0, 0, .75); }
+.partybtn:active { transform: scale(.96); }
+.partybtn__text { font-size: .92rem; }
+
+/* --- balloons that drift up the screen during the sale --- */
+.balloon {
+  position: fixed;
+  bottom: -14vh;
+  left: var(--bx, 50%);
+  z-index: 140;
+  font-size: var(--bs, 2.4rem);
+  pointer-events: none;
+  will-change: transform;
+  animation: balloon-rise var(--bd, 9s) linear forwards;
+}
 
 /* ---------- 10. FINAL CTA + FOOTER ---------- */
 .final-cta {
@@ -1399,11 +1611,6 @@ ul { margin: 0; padding: 0; list-style: none; }
   from { opacity: 0; transform: translateY(-8px); }
   to   { opacity: 1; transform: none; }
 }
-@keyframes prize-in {
-  0%   { opacity: 0; transform: translateY(10px) scale(.94); }
-  60%  { opacity: 1; transform: translateY(0)    scale(1.03); }
-  100% { opacity: 1; transform: none; }
-}
 /* The countdown's one-off "we hit zero" pop */
 @keyframes cd-pop {
   0%   { transform: scale(1); }
@@ -1418,6 +1625,63 @@ ul { margin: 0; padding: 0; list-style: none; }
 @keyframes cta-glow-invert {
   0%, 100% { box-shadow: 0 12px 26px -14px rgba(255, 182, 39, .95); }
   50%      { box-shadow: 0 0 0 9px rgba(255, 182, 39, .3), 0 12px 26px -14px rgba(255, 182, 39, .95); }
+}
+
+
+/* The strip of words under the hero. It holds the same row twice, so moving
+   it exactly half its width lands the second copy where the first began. */
+@keyframes ticker-slide {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(-50%, 0, 0); }
+}
+@keyframes livebar-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
+}
+@keyframes bar-shift {
+  from { background-position: 0% 50%; }
+  to   { background-position: 200% 50%; }
+}
+@keyframes pin-drop {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-8px); }
+}
+@keyframes opening-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes opening-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+@keyframes burst-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes word-pop {
+  0%   { opacity: 0; transform: translateY(24px) scale(.7) rotate(-4deg); }
+  70%  { opacity: 1; transform: translateY(0)    scale(1.06) rotate(1deg); }
+  100% { opacity: 1; transform: none; }
+}
+@keyframes party-bob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-6px); }
+}
+@keyframes balloon-rise {
+  from { transform: translate3d(0, 0, 0) rotate(-6deg); opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 1; }
+  to   { transform: translate3d(var(--bdrift, 40px), -125vh, 0) rotate(6deg); opacity: 0; }
+}
+/* A slow sweep of light across the hero title */
+@keyframes title-shine {
+  0%        { -webkit-mask-position: 150% 0; mask-position: 150% 0; }
+  55%, 100% { -webkit-mask-position: -50% 0; mask-position: -50% 0; }
+}
+/* The wide light rays behind the hero, turning very slowly */
+@keyframes rays-turn {
+  from { transform: translate(-50%, -30%) rotate(0deg); }
+  to   { transform: translate(-50%, -30%) rotate(360deg); }
 }
 
 /* Fade-in-on-scroll. Only hidden when JavaScript is running (the `.js` class),
@@ -1439,6 +1703,10 @@ ul { margin: 0; padding: 0; list-style: none; }
   .nav__brand-icon { font-size: 1.4rem; }
   .status { font-size: .66rem; letter-spacing: .1em; padding: .4rem .8rem; }
   .countdown { padding-inline: .7rem; }
+  .partybtn__text { display: none; }
+  .partybtn { padding: .7rem .85rem; }
+  .livebar__inner { font-size: .8rem; }
+  .livebar__link { margin-left: 0; flex-basis: 100%; }
   .countdown__grid { gap: .3rem; }
   .countdown__word { font-size: .53rem; letter-spacing: .06em; }
 }
@@ -1483,7 +1751,6 @@ ul { margin: 0; padding: 0; list-style: none; }
   /* From here up there is room for the two hero buttons side by side */
   .hero__cta { justify-content: center; grid-template-columns: repeat(2, minmax(0, 260px)); margin-inline: auto; }
   .cards { grid-template-columns: repeat(2, 1fr); }
-  .finds { grid-template-columns: repeat(2, 1fr); }
   .map-card__actions { grid-template-columns: repeat(2, 1fr); }
   .countdown { padding: 1.6rem 1.35rem 1.75rem; }
   .countdown__grid { gap: .65rem; }
@@ -1518,12 +1785,11 @@ ul { margin: 0; padding: 0; list-style: none; }
   .garage { width: 292px; }
   .garage__roof { height: 30px; }
   .map-frame { aspect-ratio: 16 / 9; }
+  .ticker__row { font-size: .92rem; gap: 1.4rem; padding-block: .85rem; }
+  .partybtn { right: 1.5rem; bottom: 1.5rem; }
   .map-card__body { padding: 1.9rem; }
   .hero__wave svg { height: 66px; }
   .bunting span { max-width: 44px; height: 32px; }
-  .finds { grid-template-columns: repeat(3, 1fr); }
-  .surprise { padding: 2.6rem 2rem 2.75rem; }
-  .notes { grid-template-columns: repeat(2, 1fr); }
 }
 
 /* Laptops and desktops */
@@ -1551,10 +1817,17 @@ ul { margin: 0; padding: 0; list-style: none; }
     scroll-behavior: auto !important;
   }
   .js .reveal { opacity: 1; transform: none; }
-  .btn:hover, .card:hover, .find:hover, .hero__fact:hover, .notes li:hover { transform: none; }
+  .btn:hover, .card:hover, .hero__fact:hover { transform: none; }
   .btn::after { display: none; }
   .garage__door { transition: none; }
   .floater { animation: none; }
+  .ticker__track { animation: none; }
+  .hero__rays, .opening__burst, .partybtn, .map-frame__pin,
+  .livebar, .livebar__dot::after, .dayprogress__fill,
+  .hero__title-line--accent::after { animation: none; }
+  .hero__title-line--accent::after { display: none; }
+  .balloon { display: none; }
+  .card.is-tilting { transform: none; }
   .sale-open #directions-hero,
   .sale-open #directions-map,
   .sale-open #directions-final { animation: none; }
@@ -1564,11 +1837,12 @@ ul { margin: 0; padding: 0; list-style: none; }
 @media print {
   .site-header, .hero__cta, .final-cta .btn, .scroll-cue,
   .map-frame, .bunting, .hero__wave, .toast, .skip-link,
-  .garage, .confetti, .hero__bg, .floaters, .surprise,
+  .garage, .confetti, .hero__bg, .floaters, .ticker,
+  .livebar, .opening, .partybtn, .map-frame__shield, .map-frame__expand,
   /* A live "starting soon / live / ended" badge means nothing on paper */
   .status { display: none !important; }
   body { background: #fff; color: #000; font-size: 12pt; }
-  .hero, .final-cta, .site-footer, .surprise { background: #fff !important; color: #000 !important; }
+  .hero, .final-cta, .site-footer { background: #fff !important; color: #000 !important; }
   .hero { margin-top: 0; padding-top: .5rem; }
   .hero__title-line:first-child { color: #000; -webkit-text-fill-color: #000; }
   .hero__title-line--accent { color: #000; text-shadow: none; }

@@ -58,19 +58,15 @@ const SITE_CONFIG = {
   badgeLive:    'Sale is live',
   badgeOver:    'Sale ended',
 
-  // The fun "reveal a surprise" button. Add or change as many as you like.
-  surprises: [
-    'Something you didn’t know you needed 👀',
-    'A hidden gem 💎',
-    'Something nostalgic 📼',
-    'A genuinely great deal 💰',
-    'A mystery item 🎁',
-    'Something for the workshop 🔧',
-    'A completely unexpected find 🤔',
-    'The perfect thing for that empty shelf 🪴',
-    'A book you’ll actually read 📚',
-    'Something you’ll argue about with a friend 😄'
-  ]
+  // --- THE "ADD TO CALENDAR" BUTTON -------------------------------------
+  // What the sale is called once it lands in someone's own calendar.
+  eventTitle:   'Garage Sale — 55 Bradley Boulevard',
+  eventDetails: 'Garage sale at 55 Bradley Boulevard, Neepawa, MB. 8:00 AM – 4:00 PM, one day only. Cash is easiest — small bills if you can.',
+
+  // --- THE MAP ------------------------------------------------------------
+  // How much ground the map shows, top to bottom, in metres. Bigger number
+  // = more of the neighbourhood, smaller = closer in on the house.
+  mapHeightMetres: 420
 };
 
 /* ========================================================================= */
@@ -103,7 +99,7 @@ const SITE_CONFIG = {
     const satellite  = 'https://www.google.com/maps/@' + lat + ',' + lon + ',18z/data=!3m1!1e3';
     const apple      = 'https://maps.apple.com/?q=' + q + '&ll=' + lat + ',' + lon;
 
-    $$('#directions-hero, #directions-map, #directions-final, #directions-nav').forEach(function (a) {
+    $$('#directions-hero, #directions-map, #directions-final, #directions-nav, #directions-live').forEach(function (a) {
       a.href = directions;
     });
     if ($('#link-satellite')) $('#link-satellite').href = satellite;
@@ -211,6 +207,12 @@ const SITE_CONFIG = {
     const note   = $('#open-note');
     const badge  = $('#status-badge');
     const badgeText = $('#status-text');
+    const livebar     = $('#livebar');
+    const livebarTime = $('#livebar-time');
+    const dayBox      = $('#dayprogress');
+    const dayFill     = $('#dayprogress-fill');
+    const dayLabel    = $('#dayprogress-label');
+    const partyBtn    = $('#party-btn');
     if (!box || !grid || !label || !status || !sub || !next) return;
 
     const days = (SITE_CONFIG.days || []).map(function (day) {
@@ -280,8 +282,12 @@ const SITE_CONFIG = {
       grid.classList.toggle('countdown__grid--hms', s.name === 'next');
       if (note)   note.hidden = !open;
       if (garage) garage.classList.toggle('is-open', open);
+      if (dayBox) dayBox.hidden = !open;
+      if (partyBtn) partyBtn.hidden = !open;
+      showLivebar(livebar, open);
       document.body.classList.toggle('sale-open', open);
       setBadge(s.name);
+      if (open) startBalloons(); else stopBalloons();
 
       if (s.name === 'before') {
         label.textContent = SITE_CONFIG.labelBefore;
@@ -339,6 +345,7 @@ const SITE_CONFIG = {
 
       setTimeout(function () {
         applyState(s);                      // also removes countdown--zero
+        playOpeningCurtain();               // the full-screen "WE'RE OPEN!"
         setTimeout(function () { dropConfetti('big'); }, 900);   // door is most of the way up
       }, 650);
     }
@@ -362,7 +369,23 @@ const SITE_CONFIG = {
       }
 
       if (s.name === 'over') return false;  // finished — stop the timer
-      if (isOpen(s.name)) return true;      // keep ticking so it closes on time
+
+      if (isOpen(s.name)) {
+        // Still open. Show how much of today is left, in the banner at the
+        // top and as a bar under the countdown, and keep ticking so the
+        // page closes itself at 4 PM.
+        const day  = days[s.index];
+        const left = Math.max(0, day.end - now);
+        const done = Math.min(1, Math.max(0, (now - day.start) / (day.end - day.start)));
+        const hrs  = Math.floor(left / 3600000);
+        const mns  = Math.floor(left / 60000) % 60;
+        const words = hrs > 0 ? hrs + 'h ' + pad(mns) + 'm' : mns + ' min';
+
+        if (livebarTime) livebarTime.textContent = 'Closes in ' + words;
+        if (dayFill)  dayFill.style.width = (done * 100).toFixed(1) + '%';
+        if (dayLabel) dayLabel.textContent = words + ' left today';
+        return true;
+      }
 
       // Counting down to days[s.index]. During an overnight wait the days
       // box is hidden, so those hours are rolled into the hours box.
@@ -501,7 +524,104 @@ const SITE_CONFIG = {
   }
 
   /* ---------------------------------------------------------------------
-     3c. PREVIEW MODE — FOR TESTING ONLY
+     3c. THE REST OF THE SALE-DAY CELEBRATION
+     The confetti above is the noisy part. These three are the quieter ones:
+     the green "we're open" banner at the top of the page, a screenful of
+     "WE'RE OPEN!" the moment the clock reaches 8:00 AM, and balloons that
+     keep drifting up the screen all day.
+     --------------------------------------------------------------------- */
+
+  /* Shows or hides the banner. It sits above the sticky navigation, so its
+     height has to be handed to the stylesheet — that is what pushes the
+     navigation bar (and anchor links) down out of the way. */
+  function showLivebar(bar, open) {
+    if (!bar) return;
+    bar.hidden = !open;
+    const write = function () {
+      document.documentElement.style.setProperty(
+        '--livebar-h', open ? bar.offsetHeight + 'px' : '0px');
+    };
+    write();
+    if (open && !bar._watching) {
+      bar._watching = true;
+      window.addEventListener('resize', write, { passive: true });
+    }
+  }
+
+  /* One screenful of celebration, then it takes itself away again. */
+  function playOpeningCurtain() {
+    const el = $('#opening');
+    if (!el || prefersReducedMotion) return;
+
+    el.hidden = false;
+    setTimeout(function () {
+      el.classList.add('is-leaving');
+      setTimeout(function () {
+        el.hidden = true;
+        el.classList.remove('is-leaving');
+      }, 750);
+    }, 2600);
+  }
+
+  /* Balloons. One every few seconds while the sale is on; each one removes
+     itself when it reaches the top, so they never pile up. */
+  let balloonTimer = null;
+  const BALLOON_EMOJI = ['🎈', '🎈', '🎈', '🎉', '🛍️'];
+
+  function releaseBalloon() {
+    // A hidden tab keeps firing timers on some browsers; there is no point
+    // animating anything nobody is looking at.
+    if (document.hidden) return;
+    const el = document.createElement('span');
+    el.className = 'balloon';
+    el.setAttribute('aria-hidden', 'true');
+    el.textContent = BALLOON_EMOJI[Math.floor(Math.random() * BALLOON_EMOJI.length)];
+    el.style.setProperty('--bx',     (4 + Math.random() * 92) + '%');
+    el.style.setProperty('--bs',     (1.7 + Math.random() * 1.6).toFixed(2) + 'rem');
+    el.style.setProperty('--bd',     (8 + Math.random() * 7).toFixed(1) + 's');
+    el.style.setProperty('--bdrift', (-70 + Math.random() * 140).toFixed(0) + 'px');
+    document.body.appendChild(el);
+    el.addEventListener('animationend', function () {
+      if (el.parentNode) el.parentNode.removeChild(el);
+    });
+  }
+
+  function startBalloons() {
+    if (balloonTimer || prefersReducedMotion) return;
+    releaseBalloon();
+    balloonTimer = setInterval(releaseBalloon, 2600);
+  }
+
+  function stopBalloons() {
+    clearInterval(balloonTimer);
+    balloonTimer = null;
+  }
+
+  /* The floating "Celebrate" button, and a confetti burst for anyone who
+     taps the page while the sale is on. */
+  function initParty() {
+    const btn = $('#party-btn');
+    if (btn) {
+      btn.addEventListener('click', function () {
+        dropConfetti('small');
+        btn.animate
+          ? btn.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.18)' }, { transform: 'scale(1)' }],
+                        { duration: 380, easing: 'cubic-bezier(.2,1.3,.4,1)' })
+          : null;
+      });
+    }
+
+    // Tapping the big hero headline during the sale throws confetti too.
+    const title = $('#hero-title');
+    if (title) {
+      title.addEventListener('click', function () {
+        if (document.body.classList.contains('sale-open')) dropConfetti('small');
+      });
+    }
+  }
+
+  /* ---------------------------------------------------------------------
+     3d. PREVIEW MODE — FOR TESTING ONLY
      Off unless you deliberately put ?preview=... on the end of the address,
      so the live website is never affected. Delete this function (and the
      one line that calls it) if you'd rather it not exist at all.
@@ -705,30 +825,184 @@ const SITE_CONFIG = {
   }
 
   /* ---------------------------------------------------------------------
-     7. THE SURPRISE MACHINE
-     Picks a random line, never the same one twice in a row.
-     --------------------------------------------------------------------- */
-  function initSurprise() {
-    const btn = $('#surprise-btn');
-    const out = $('#surprise-out');
-    if (!btn || !out) return;
+     7. THE MAP
+     The embedded map draws itself to fit whatever size the frame is at the
+     moment it loads. If the frame is still settling — web fonts landing,
+     images arriving, the page reflowing — it can end up drawing a small map
+     inside a big empty box. Two things fix that here:
 
-    const lines = SITE_CONFIG.surprises || [];
-    if (!lines.length) { btn.hidden = true; return; }
-    let last = -1;
+       * the address is only handed to the map AFTER the frame has been
+         measured, so it never loads at the wrong size;
+       * the piece of ground it is asked to show is worked out from the
+         frame's own width-to-height ratio, so the map fills the frame
+         instead of being letterboxed inside it;
+       * and if the frame changes shape (turning a phone sideways, dragging
+         a window wider) the map is asked again, once things settle.
+     --------------------------------------------------------------------- */
+  function initMap() {
+    const frame = $('#map-frame');
+    const embed = $('#map-embed');
+    if (!frame || !embed) return;
+
+    const lat = SITE_CONFIG.latitude;
+    const lon = SITE_CONFIG.longitude;
+
+    /* A rectangle around the house, in degrees, shaped like the frame. */
+    function boxFor(width, height) {
+      const metres = SITE_CONFIG.mapHeightMetres || 420;
+      const ratio  = (width > 0 && height > 0) ? (width / height) : 1.5;
+
+      // 111320 m is one degree of latitude. A degree of longitude is shorter
+      // the further north you go, hence the cosine — without it the map comes
+      // out stretched sideways this far north.
+      const halfLat = (metres / 2) / 111320;
+      const halfLon = halfLat * ratio / Math.cos(lat * Math.PI / 180);
+
+      return [(lon - halfLon).toFixed(6), (lat - halfLat).toFixed(6),
+              (lon + halfLon).toFixed(6), (lat + halfLat).toFixed(6)].join(',');
+    }
+
+    let lastKey = '';
+
+    function load() {
+      const rect = frame.getBoundingClientRect();
+      if (rect.width < 40 || rect.height < 40) return;      // not laid out yet
+
+      // Round the size before comparing, so a one-pixel wobble during
+      // scrolling never reloads the map.
+      const key = Math.round(rect.width / 20) + 'x' + Math.round(rect.height / 20);
+      if (key === lastKey) return;
+      lastKey = key;
+
+      embed.src = 'https://www.openstreetmap.org/export/embed.html' +
+                  '?bbox=' + encodeURIComponent(boxFor(rect.width, rect.height)) +
+                  '&layer=mapnik' +
+                  '&marker=' + lat + '%2C' + lon;
+    }
+
+    // Wait for the browser to finish laying the page out before measuring.
+    requestAnimationFrame(function () { requestAnimationFrame(load); });
+    window.addEventListener('load', load);
+
+    // Re-fit when the frame changes shape, but only once it has stopped.
+    let settle;
+    const later = function () { clearTimeout(settle); settle = setTimeout(load, 350); };
+    if ('ResizeObserver' in window) new ResizeObserver(later).observe(frame);
+    else window.addEventListener('resize', later, { passive: true });
+
+    // The pane over the map keeps a swipe scrolling the page. One tap lifts it.
+    const shield = $('#map-shield');
+    if (shield) {
+      shield.addEventListener('click', function () {
+        frame.classList.add('is-live');
+        shield.setAttribute('tabindex', '-1');
+      });
+    }
+
+    // "Full screen" opens the same spot on openstreetmap.org.
+    const expand = $('#map-expand');
+    if (expand) {
+      expand.href = 'https://www.openstreetmap.org/?mlat=' + lat + '&mlon=' + lon +
+                    '#map=17/' + lat + '/' + lon;
+    }
+  }
+
+  /* ---------------------------------------------------------------------
+     7b. "ADD TO CALENDAR"
+     Writes a standard .ics calendar file in the browser and hands it over
+     as a download. Apple Calendar, Google Calendar, Outlook and the phone
+     calendar apps all understand it, so there is nothing to sign in to.
+     --------------------------------------------------------------------- */
+  function icsStamp(ms) {
+    // Calendar files want UTC, written as 20260822T130000Z.
+    return new Date(ms).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+  }
+
+  function buildIcs() {
+    const day = (SITE_CONFIG.days || [])[0];
+    if (!day) return null;
+    const start = new Date(day.startISO).getTime();
+    const end   = new Date(day.endISO).getTime();
+    if (isNaN(start) || isNaN(end)) return null;
+
+    // Long lines have to be wrapped at 75 characters, and commas escaped.
+    const esc = function (t) { return String(t).replace(/([,;\\])/g, '\\$1'); };
+
+    return [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//Garage Sale//EN',
+      'CALSCALE:GREGORIAN',
+      'BEGIN:VEVENT',
+      'UID:' + start + '@garage-sale',
+      'DTSTAMP:' + icsStamp(Date.now()),
+      'DTSTART:' + icsStamp(start),
+      'DTEND:'   + icsStamp(end),
+      'SUMMARY:' + esc(SITE_CONFIG.eventTitle),
+      'DESCRIPTION:' + esc(SITE_CONFIG.eventDetails + ' ' + SITE_CONFIG.siteUrl),
+      'LOCATION:' + esc(SITE_CONFIG.address),
+      'URL:' + SITE_CONFIG.siteUrl,
+      'GEO:' + SITE_CONFIG.latitude + ';' + SITE_CONFIG.longitude,
+      // A reminder the evening before, so it isn't forgotten.
+      'BEGIN:VALARM',
+      'TRIGGER:-PT14H',
+      'ACTION:DISPLAY',
+      'DESCRIPTION:' + esc(SITE_CONFIG.eventTitle) + ' is tomorrow',
+      'END:VALARM',
+      'END:VEVENT',
+      'END:VCALENDAR'
+    ].join('\r\n');
+  }
+
+  function initCalendar() {
+    const btn = $('#add-calendar');
+    if (!btn) return;
 
     btn.addEventListener('click', function () {
-      let i = Math.floor(Math.random() * lines.length);
-      if (lines.length > 1 && i === last) i = (i + 1) % lines.length;
-      last = i;
+      const text = buildIcs();
+      if (!text) { toast('Sorry — the calendar file could not be made.'); return; }
 
-      out.textContent = lines[i];
-      out.classList.remove('is-new');
-      void out.offsetWidth;                 // restart the animation
-      out.classList.add('is-new');
-      btn.textContent = '';
-      btn.insertAdjacentHTML('beforeend',
-        '<span aria-hidden="true">🎲</span> Try another');
+      const blob = new Blob([text], { type: 'text/calendar;charset=utf-8' });
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      a.href = url;
+      a.download = 'garage-sale.ics';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      // Give the download a moment to start before the file is thrown away.
+      setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+
+      toast('Saved to your calendar app 📅');
+    });
+  }
+
+  /* ---------------------------------------------------------------------
+     7c. THE DETAIL CARDS LEAN TOWARDS THE POINTER
+     Mouse and trackpad only — on a touch screen there is no pointer to
+     follow, and the cards would only ever be tilted by accident.
+     --------------------------------------------------------------------- */
+  function initCardTilt() {
+    if (prefersReducedMotion) return;
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+
+    $$('.card').forEach(function (card) {
+      card.addEventListener('pointermove', function (e) {
+        const r = card.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width;
+        const y = (e.clientY - r.top)  / r.height;
+        card.style.setProperty('--mx', (x * 100).toFixed(1) + '%');
+        card.style.setProperty('--my', (y * 100).toFixed(1) + '%');
+        card.style.setProperty('--tilt-y', ((x - 0.5) *  7).toFixed(2) + 'deg');
+        card.style.setProperty('--tilt-x', ((y - 0.5) * -7).toFixed(2) + 'deg');
+        card.classList.add('is-tilting');
+      }, { passive: true });
+
+      card.addEventListener('pointerleave', function () {
+        card.classList.remove('is-tilting');
+        card.style.removeProperty('--tilt-x');
+        card.style.removeProperty('--tilt-y');
+      });
     });
   }
 
@@ -788,7 +1062,10 @@ const SITE_CONFIG = {
     initNav();
     initScrollChrome();
     initParallax();
-    initSurprise();
+    initMap();
+    initCalendar();
+    initCardTilt();
+    initParty();
     initReveal();
     initActiveNav();
   }

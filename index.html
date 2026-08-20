@@ -8,7 +8,7 @@
      PAGE TITLE + DESCRIPTION (shown in Google + browser tabs)
      ========================================================== -->
 <title>Garage Sale — August 22, 2026 | Neepawa, MB</title>
-<meta name="description" content="Garage sale at 55 Bradley Boulevard, Neepawa, Manitoba. Saturday, August 22, 2026, 8:00 AM to 4:00 PM. One day only — household and miscellaneous items. Stop by any time!">
+<meta name="description" content="Garage sale at 55 Bradley Boulevard, Neepawa, Manitoba. Saturday, August 22, 2026, 8:00 AM to 4:00 PM. One day only. Live countdown, map and directions on the site.">
 <meta name="theme-color" content="#101E26">
 <meta name="author" content="Garage Sale at 55 Bradley Boulevard">
 <meta name="robots" content="index, follow">
@@ -24,16 +24,16 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Garage Sale — Neepawa, MB">
 <meta property="og:title" content="Garage Sale — Saturday, August 22, 2026">
-<meta property="og:description" content="55 Bradley Boulevard, Neepawa, MB · 8:00 AM – 4:00 PM, one day only. Household and miscellaneous items. Come take a look and see what you can find!">
+<meta property="og:description" content="55 Bradley Boulevard, Neepawa, MB · 8:00 AM – 4:00 PM, one day only. Scan the QR code on the picture — or tap this post — for the map, directions and a live countdown.">
 <meta property="og:url" content="https://aj01-a.github.io/garage-sale/">
 <meta property="og:image" content="https://aj01-a.github.io/garage-sale/assets/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Garage Sale poster: Saturday, August 22, 8 AM to 4 PM, 55 Bradley Boulevard, Neepawa MB">
+<meta property="og:image:alt" content="Garage Sale poster: Saturday, August 22, 8 AM to 4 PM, 55 Bradley Boulevard, Neepawa MB, with a QR code to scan for the map and directions">
 <meta property="og:locale" content="en_CA">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Garage Sale — Saturday, August 22, 2026">
-<meta name="twitter:description" content="55 Bradley Boulevard, Neepawa, MB · 8:00 AM – 4:00 PM, one day only. Come take a look and see what you can find!">
+<meta name="twitter:description" content="55 Bradley Boulevard, Neepawa, MB · 8:00 AM – 4:00 PM, one day only. Scan the QR code for the map and directions.">
 <meta name="twitter:image" content="https://aj01-a.github.io/garage-sale/assets/og-image.png">
 
 <!-- Icons -->
@@ -99,6 +99,18 @@
 
 <a class="skip-link" href="#main">Skip to main content</a>
 
+<!-- ================= "OPEN NOW" BANNER =================
+     Hidden until the sale is actually happening. JavaScript unhides it,
+     keeps the "closes in ..." clock running, and hides it again at 4 PM. -->
+<div class="livebar" id="livebar" hidden>
+  <div class="livebar__inner">
+    <span class="livebar__dot" aria-hidden="true"></span>
+    <strong class="livebar__title">We&rsquo;re open right now!</strong>
+    <span class="livebar__time" id="livebar-time"></span>
+    <a class="livebar__link" id="directions-live" href="https://www.google.com/maps/dir/?api=1&amp;destination=55%20Bradley%20Boulevard%2C%20Neepawa%2C%20MB%2C%20Canada" target="_blank" rel="noopener">Directions &rarr;</a>
+  </div>
+</div>
+
 <!-- ================= NAVIGATION ================= -->
 <header class="site-header" id="site-header">
   <nav class="nav" aria-label="Main">
@@ -110,7 +122,6 @@
     <ul class="nav__links" id="nav-links">
       <li><a href="#details">Details</a></li>
       <li><a href="#find-us">Find&nbsp;Us</a></li>
-      <li><a href="#what-youll-find">What&nbsp;You&rsquo;ll&nbsp;Find</a></li>
     </ul>
 
     <div class="nav__end">
@@ -136,12 +147,13 @@
   <section class="hero" aria-labelledby="hero-title">
 
     <!-- Decorative background: three slow-moving colour washes, a grid,
-         a few floating garage-sale objects, and a film-grain overlay. -->
+         a sweep of light, a few floating garage-sale objects, and grain. -->
     <div class="hero__bg" aria-hidden="true">
       <span class="blob blob--1"></span>
       <span class="blob blob--2"></span>
       <span class="blob blob--3"></span>
       <span class="hero__grid"></span>
+      <span class="hero__rays"></span>
       <span class="hero__grain"></span>
     </div>
     <div class="floaters" aria-hidden="true" id="floaters">
@@ -173,7 +185,7 @@
 
       <h1 class="hero__title" id="hero-title">
         <span class="hero__title-line">GARAGE</span>
-        <span class="hero__title-line hero__title-line--accent">SALE!</span>
+        <span class="hero__title-line hero__title-line--accent" data-text="SALE!">SALE!</span>
       </h1>
 
       <p class="hero__tagline">One day only. Come take a look and see what you can find.</p>
@@ -253,6 +265,13 @@
             <span class="countdown__word">Seconds</span>
           </div>
         </div>
+
+        <!-- Only while the sale is on: how much of the day is left, as a bar. -->
+        <div class="dayprogress" id="dayprogress" hidden>
+          <div class="dayprogress__track"><span class="dayprogress__fill" id="dayprogress-fill"></span></div>
+          <p class="dayprogress__label" id="dayprogress-label"></p>
+        </div>
+
         <!-- Screen-reader friendly, updates politely instead of every second -->
         <p class="visually-hidden" aria-live="polite" id="countdown-sr"></p>
       </div>
@@ -261,14 +280,16 @@
         <a class="btn btn--primary btn--lg" id="directions-hero" href="https://www.google.com/maps/dir/?api=1&amp;destination=55%20Bradley%20Boulevard%2C%20Neepawa%2C%20MB%2C%20Canada" target="_blank" rel="noopener">
           <span aria-hidden="true">🧭</span> Get Directions
         </a>
-        <a class="btn btn--glass btn--lg" href="#what-youll-find">
-          <span aria-hidden="true">🛍️</span> See What&rsquo;s Available
-        </a>
+        <!-- Downloads a calendar file so the sale lands in the visitor's own
+             calendar app with a reminder. Built by script.js. -->
+        <button class="btn btn--glass btn--lg" type="button" id="add-calendar">
+          <span aria-hidden="true">📅</span> Add to Calendar
+        </button>
       </div>
 
       <!-- Only shown while the sale is actually happening -->
       <p class="hero__open-note" id="open-note" hidden>
-        <span aria-hidden="true">🏠</span> We&rsquo;re open! Look for the garage sale in the driveway.
+        <span aria-hidden="true">🏠</span> We&rsquo;re open! Come on by &mdash; everything is set up outside.
       </p>
 
       <a class="scroll-cue" href="#details">
@@ -283,13 +304,27 @@
     </div>
   </section>
 
+  <!-- ================= SCROLLING TICKER =================
+       Purely decorative. The same words twice over, sliding by, so the
+       strip never shows a gap. -->
+  <div class="ticker" aria-hidden="true">
+    <div class="ticker__track">
+      <span class="ticker__row">
+        <b>Saturday, August 22</b><i>★</i><b>8 AM &ndash; 4 PM</b><i>★</i><b>55 Bradley Blvd</b><i>★</i><b>Neepawa, MB</b><i>★</i><b>One day only</b><i>★</i>
+      </span>
+      <span class="ticker__row">
+        <b>Saturday, August 22</b><i>★</i><b>8 AM &ndash; 4 PM</b><i>★</i><b>55 Bradley Blvd</b><i>★</i><b>Neepawa, MB</b><i>★</i><b>One day only</b><i>★</i>
+      </span>
+    </div>
+  </div>
+
   <!-- ================= DETAILS CARDS ================= -->
   <section class="section section--details" id="details" aria-labelledby="details-title">
     <div class="container">
       <p class="section__kicker reveal">The important bits</p>
       <h2 class="section__title reveal" id="details-title">Everything you need to know</h2>
 
-      <ul class="cards">
+      <ul class="cards" id="cards">
         <li class="card reveal" style="--i:0">
           <span class="card__icon" aria-hidden="true">📅</span>
           <h3 class="card__title">When</h3>
@@ -309,10 +344,10 @@
           <p class="card__note"><a href="#find-us">See it on the map &rarr;</a></p>
         </li>
         <li class="card reveal" style="--i:3">
-          <span class="card__icon" aria-hidden="true">🏠</span>
-          <h3 class="card__title">Setup</h3>
-          <p class="card__body"><strong>Right in the driveway</strong></p>
-          <p class="card__note">Everything is set up outside &mdash; just walk up!</p>
+          <span class="card__icon" aria-hidden="true">💵</span>
+          <h3 class="card__title">Bring</h3>
+          <p class="card__body"><strong>Cash &mdash; small bills</strong></p>
+          <p class="card__note">And a bag or box for your finds</p>
         </li>
       </ul>
 
@@ -335,13 +370,27 @@
       </p>
 
       <div class="map-card reveal">
-        <!-- Interactive map: OpenStreetMap's official embed (free + allowed to embed) -->
-        <div class="map-frame">
-          <iframe
+        <!-- Interactive map: OpenStreetMap's official embed (free + allowed to
+             embed). The `src` is written by script.js once the box has been
+             measured, so the map area always matches the shape of the frame
+             instead of being letterboxed inside it. The href below is both the
+             no-JavaScript fallback and the "open full screen" link. -->
+        <div class="map-frame" id="map-frame">
+          <iframe id="map-embed"
             title="Map showing 55 Bradley Boulevard, Neepawa, Manitoba"
-            src="https://www.openstreetmap.org/export/embed.html?bbox=-99.4678%2C50.2352%2C-99.4528%2C50.2416&amp;layer=mapnik&amp;marker=50.2383757%2C-99.4602787"
-            loading="lazy"
+            src="https://www.openstreetmap.org/export/embed.html?bbox=-99.4718%2C50.2354%2C-99.4488%2C50.2414&amp;layer=mapnik&amp;marker=50.2383757%2C-99.4602787"
             referrerpolicy="no-referrer-when-downgrade"></iframe>
+          <!-- Sits over the map so a swipe scrolls the page instead of panning
+               the map. One tap lifts it and the map becomes draggable. -->
+          <button class="map-frame__shield" id="map-shield" type="button">
+            <span class="map-frame__pin" aria-hidden="true">📍</span>
+            <span class="map-frame__hint">Tap the map to move it around</span>
+          </button>
+          <a class="map-frame__expand" id="map-expand"
+             href="https://www.openstreetmap.org/?mlat=50.2383757&amp;mlon=-99.4602787#map=17/50.2383757/-99.4602787"
+             target="_blank" rel="noopener">
+            <span aria-hidden="true">⛶</span> Full screen
+          </a>
         </div>
 
         <div class="map-card__body">
@@ -370,9 +419,6 @@
             </a>
           </div>
 
-          <p class="map-card__note">
-            Look for the tables in the driveway. There is plenty of room to park on the street.
-          </p>
           <p class="map-card__credit">
             Map data &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors.
             The pin marks Bradley Boulevard
@@ -386,56 +432,6 @@
              alt="Illustration of a house on Bradley Boulevard with a marker reading Garage Sale Here, tables set up in the driveway.">
         <figcaption>The sale is set up in the driveway, directly outside the house.</figcaption>
       </figure>
-    </div>
-  </section>
-
-  <!-- ================= WHAT YOU'LL FIND =================
-       EASY TO EDIT: change the paragraph below, and add or remove
-       cards in the list to match what you're actually selling.
-       ============================================================ -->
-  <section class="section section--find" id="what-youll-find" aria-labelledby="what-title">
-    <div class="container">
-      <p class="section__kicker reveal">Come browse</p>
-      <h2 class="section__title reveal" id="what-title">What You&rsquo;ll Find</h2>
-      <p class="section__lead reveal">
-        A variety of household and miscellaneous items, all set out in the driveway.
-        Have a wander &mdash; you never know what you&rsquo;ll find.
-      </p>
-
-      <ul class="finds" id="category-list">
-        <li class="find reveal" style="--i:0">
-          <span class="find__icon" aria-hidden="true">🏡</span>
-          <h3 class="find__title">Household</h3>
-          <p class="find__body">Kitchen bits, homeware and the useful things every house collects.</p>
-        </li>
-        <li class="find reveal" style="--i:1">
-          <span class="find__icon" aria-hidden="true">🧺</span>
-          <h3 class="find__title">Miscellaneous</h3>
-          <p class="find__body">Odds and ends of every description &mdash; the classic garage-sale table.</p>
-        </li>
-        <li class="find reveal" style="--i:2">
-          <span class="find__icon" aria-hidden="true">🎁</span>
-          <h3 class="find__title">Surprise finds</h3>
-          <p class="find__body">The things nobody expects. They go to whoever spots them first.</p>
-        </li>
-      </ul>
-
-      <!-- ============ THE SURPRISE MACHINE (just for fun) ============ -->
-      <div class="surprise reveal">
-        <h3 class="surprise__title">What will you find?</h3>
-        <p class="surprise__lead">There&rsquo;s only one way to know for sure &mdash; but here&rsquo;s a guess.</p>
-        <p class="surprise__out" id="surprise-out" aria-live="polite">
-          <span class="surprise__placeholder">Press the button&hellip;</span>
-        </p>
-        <button class="btn btn--invert" type="button" id="surprise-btn">
-          <span aria-hidden="true">🎲</span> Reveal a surprise
-        </button>
-      </div>
-
-      <ul class="notes">
-        <li class="reveal"><span class="notes__icon" aria-hidden="true">💵</span> <span><strong>Cash is easiest</strong> &mdash; please bring small bills if you can.</span></li>
-        <li class="reveal"><span class="notes__icon" aria-hidden="true">🛍️</span> <span><strong>Bring a bag or box</strong> for anything you take home.</span></li>
-      </ul>
     </div>
   </section>
 
@@ -469,6 +465,20 @@
     <p class="site-footer__back"><a href="#top">Back to top &uarr;</a></p>
   </div>
 </footer>
+
+<!-- ================= SALE-DAY CELEBRATION =================
+     Empty and hidden until the clock reaches 8:00 AM. JavaScript fills in
+     the wording, plays it once, then hides it again. -->
+<div class="opening" id="opening" hidden aria-hidden="true">
+  <div class="opening__burst"></div>
+  <p class="opening__word">WE&rsquo;RE&nbsp;OPEN!</p>
+  <p class="opening__sub">The garage sale has started &mdash; come on down!</p>
+</div>
+
+<!-- Floating "throw some confetti" button. Only appears during the sale. -->
+<button class="partybtn" id="party-btn" type="button" hidden>
+  <span aria-hidden="true">🎉</span><span class="partybtn__text">Celebrate</span>
+</button>
 
 <!-- Small pop-up confirmation used by the copy button -->
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>

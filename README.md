@@ -18,7 +18,7 @@ It also comes with ready-to-post **advertisement images** for Facebook, Messenge
 Garage-Sale/
 ├── index.html                  ← the whole website (all the text lives here)
 ├── styles.css                  ← the colours, fonts and layout
-├── script.js                   ← countdown, opening celebration, map links, menu, copy button
+├── script.js                   ← countdown, opening celebration, map, calendar file, menu
 ├── site.webmanifest            ← name + icons when saved to a phone home screen
 ├── .nojekyll                   ← tells GitHub Pages to serve the files as-is
 ├── README.md                   ← this file
@@ -28,7 +28,7 @@ Garage-Sale/
 │   ├── garage-sale-ad.png      ← Facebook / Messenger ad  (1200 × 1200, post this one)
 │   ├── garage-sale-poster.svg  ← printable poster (8.5 × 11 in, editable)
 │   ├── garage-sale-poster.png  ← printable poster (2550 × 3300, 300 dpi — print this one)
-│   ├── garage-sale-qr.png      ← QR code (printed on the poster)
+│   ├── garage-sale-qr.png      ← QR code (built into the poster and both ad pictures)
 │   ├── garage-sale-qr.svg      ← QR code (vector version)
 │   ├── og-image.png            ← preview picture shown when the link is shared
 │   ├── location-illustration.svg / .png ← "garage sale here" drawing
@@ -79,8 +79,8 @@ the address:
 | Add this to the address | What you'll see |
 | --- | --- |
 | `?preview=before` | Two days to go — the normal countdown |
-| `?preview=open` | Five seconds before it opens, so you can watch the whole thing: the numbers hit zero, the garage door rolls up, confetti falls, and the card turns into **🎉 THE SALE IS ON! 🎉** |
-| `?preview=live` | Arriving in the middle of the sale |
+| `?preview=open` | Five seconds before it opens, so you can watch the whole thing: the numbers hit zero, the garage door rolls up, the screen fills with **WE'RE OPEN!**, confetti falls, and the card turns into **🎉 THE SALE IS ON! 🎉** |
+| `?preview=live` | Arriving in the middle of the sale — green banner at the top, "X hours left today" bar, balloons, and the **Celebrate** button |
 | `?preview=closing` | Ten seconds before the 4:00 PM finish |
 | `?preview=ended` | After the sale — **👋 The sale has ended** |
 | `?at=2026-08-22T07:59:55-05:00` | Pretend it is any exact moment you like |
@@ -223,55 +223,17 @@ between the tags. You don't need to understand the tags — just change the word
 | Big "GARAGE SALE!" heading | `index.html` → search for `hero__title` |
 | Date, time, address at the top | `index.html` → search for `hero__facts` |
 | The four information cards | `index.html` → search for `<ul class="cards">` |
-| "What You'll Find" paragraph | `index.html` → search for `class="pitch"` |
-| The three "What You'll Find" cards | `index.html` → search for `id="category-list"` |
-| The fun "Reveal a surprise" lines | `script.js` → the `surprises` list at the top |
+| The scrolling strip of words under the hero | `index.html` → search for `class="ticker"` |
 | The wording in the little status pill | `script.js` → `badgeBefore`, `badgeLive`, `badgeOver` |
-| The helpful notes (cash, bags) | `index.html` → search for `<ul class="notes">` |
+| The green "we're open right now" bar | `index.html` → search for `id="livebar"` |
+| The "WE'RE OPEN!" celebration screen | `index.html` → search for `id="opening"` |
+| What the sale is called in someone's calendar | `script.js` → `eventTitle`, `eventDetails` |
+| How much ground the map shows | `script.js` → `mapHeightMetres` |
 | **The countdown dates/times** | `script.js` → the `days` list at the very top |
 | The wording on sale day ("THE SALE IS ON!", "The sale has ended") | `script.js` → `messageLive`, `subLive`, `messageOver`, `subOver` |
 | The "look for us in the driveway" note | `index.html` → search for `open-note` |
 | The address used by the map buttons | `script.js` → `address`, `latitude`, `longitude` |
 | Google/Facebook preview text | `index.html` → the `<meta ...>` lines near the top |
-
-### Adding a new item category
-
-Find this in `index.html`:
-
-```html
-<ul class="finds" id="category-list">
-  <li class="find reveal" style="--i:0">
-    <span class="find__icon" aria-hidden="true">🏡</span>
-    <h3 class="find__title">Household</h3>
-    <p class="find__body">Kitchen bits, homeware and the useful things every house collects.</p>
-  </li>
-```
-
-Copy one whole `<li>...</li>` block, paste it underneath, and change the emoji
-and the words. Bump the `--i:0` number by one each time — that is only the
-order the cards fade in as you scroll.
-
-### Changing the dates
-
-If you move the sale, change **three** things:
-
-1. The visible text in `index.html` (a few spots — use Find for `August 22`).
-2. The days in `script.js`. There is one line per day of the sale:
-   ```js
-   days: [
-     { startISO: '2026-08-22T08:00:00-05:00', endISO: '2026-08-22T16:00:00-05:00' }   // Saturday
-   ],
-   ```
-   Keep the `-05:00` on the end — that's Manitoba summer time, and it makes the countdown
-   correct for visitors in every time zone. (In winter, Manitoba is `-06:00`.)
-3. The `<script type="application/ld+json">` block near the top of `index.html`
-   — that is the copy Google reads. Change `startDate` and `endDate` to match.
-
-**Adding a second day** is just adding a line to `days`. Everything else follows
-by itself: the countdown, an overnight "back tomorrow" message, which morning
-gets the big celebration, and when the sale is finally over. If you do, change
-`subNext` in `script.js` too — it is the one message with wording about
-tomorrow in it.
 
 ---
 
@@ -310,13 +272,18 @@ All pictures live in the **`assets`** folder.
 
 | File | Use it for |
 | --- | --- |
-| `assets/garage-sale-ad.png` | Facebook posts, Messenger, Instagram, texting. Square 1200 × 1200 — looks right everywhere. |
+| `assets/garage-sale-ad.png` | Facebook posts, Messenger, Instagram, texting. Square 1200 × 1200 — looks right everywhere. It has the QR code on it, with "Scan for the map & directions" spelled out. |
 | `assets/garage-sale-poster.png` | Printing. It's letter size (8.5 × 11 in) at 300 dpi, with the QR code on it. |
-| `assets/og-image.png` | Used automatically for the link preview — you don't need to touch it. |
+| `assets/og-image.png` | Used automatically for the link preview when you paste the address anywhere — you don't need to touch it. It carries the QR code too. |
 | `assets/garage-sale-qr.png` | The QR code on its own, if you want it on a hand-made sign. It is already built into the poster. |
 
 **To post on Facebook:** open `assets/garage-sale-ad.png`, save it to your phone or
-computer, then attach it to your post and paste the website link in the text.
+computer, then attach it to your post and paste the website link in the text. The QR
+code in the picture goes to the same website, so anyone scrolling past can point a
+phone camera at it and get the map, directions and the countdown without tapping a link.
+
+> Re-run `python3 tools/build-assets.py` after changing the website address, or the
+> QR code in the picture will still point at the old one.
 
 **To print the poster:** open `assets/garage-sale-poster.png`, print at
 **100% / Actual size** on letter paper. Remember to regenerate the QR code first
@@ -333,14 +300,17 @@ computer, then attach it to your post and paste the website link in the text.
   the correct "open" or "ended" message.
 * The confetti is about 40 lines of plain JavaScript drawing on one `<canvas>`, which
   deletes itself after four seconds. No library, nothing left running afterwards.
-* No frameworks and no JavaScript libraries — the whole page is well under 100 KB of
-  code, plus a lazy-loaded map that only loads when you scroll to it.
+* No frameworks and no JavaScript libraries — the whole page is well under 100 KB of code.
 * One web font (Outfit) is loaded without blocking the page. If it is slow or the
   visitor is offline, the system font is used instead and nothing waits.
 * The background washes, the floating objects, the film grain and the scroll
   fade-ins are all plain CSS. The confetti is the only canvas on the page, and it
   deletes itself when it finishes.
 * The map is OpenStreetMap's official embed, which is free to use and correctly credited.
+  It is only handed the address once the page has finished laying itself out, and the
+  patch of ground it shows is worked out from the shape of its box — that is what stops
+  it drawing a small map inside a big empty frame. A pane over it means a swipe scrolls
+  the page; one tap lifts the pane and the map can be dragged.
 
 ---
 

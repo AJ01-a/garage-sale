@@ -7,9 +7,9 @@ What it does
 1. Reads the website address (siteUrl) out of script.js.
 2. Creates the QR code   -> assets/garage-sale-qr.png  and  .svg
 3. Turns every SVG into a PNG:
-       assets/garage-sale-ad.png       1200 x 1200  (Facebook / Messenger)
+       assets/garage-sale-ad.png       1200 x 1200  (Facebook / Messenger, has the QR code)
        assets/garage-sale-poster.png   2550 x 3300  (8.5x11 inch, 300 dpi print)
-       assets/og-image.png             1200 x  630  (link preview image)
+       assets/og-image.png             1200 x  630  (link preview image, has the QR code)
        assets/favicon-32.png             32 x   32
        assets/apple-touch-icon.png      180 x  180
 
@@ -97,12 +97,13 @@ def build_pngs():
             continue
 
         kwargs = {"url": src_path}
-        # The poster points at garage-sale-qr.png. The renderer refuses to read
-        # local files for security reasons, so paste the QR straight into the
-        # drawing as text (a "data URI") before rendering it.
-        if src == "garage-sale-poster.svg":
-            with open(src_path, "r", encoding="utf-8") as fh:
-                markup = fh.read()
+        # The poster and the two Facebook pictures point at garage-sale-qr.png.
+        # The renderer refuses to read local files for security reasons, so
+        # paste the QR straight into the drawing as text (a "data URI")
+        # before rendering it.
+        with open(src_path, "r", encoding="utf-8") as fh:
+            markup = fh.read()
+        if "garage-sale-qr.png" in markup:
             markup = markup.replace("garage-sale-qr.png", qr_data_uri())
             kwargs = {"bytestring": markup.encode("utf-8")}
 
